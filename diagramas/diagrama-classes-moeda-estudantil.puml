@@ -1,0 +1,156 @@
+@startuml
+
+
+
+' =========================
+' CLASSES
+' =========================
+
+abstract class Usuario {
+    -id : Int
+    -nome : String
+    -email : String
+    -senha : String
+    -cpf : String
+    -tipo : TipoUsuario
+}
+
+class Aluno {
+    -rg : String
+    -matricula : String
+}
+
+class Professor {
+    -departamento : String
+}
+
+class EmpresaParceira {
+    -cnpj : String
+    -nomeFantasia : String
+}
+
+class InstituicaoEnsino {
+    -id : Int
+    -nome : String
+}
+
+class Endereco {
+    -logradouro : String
+    -numero : String
+    -complemento : String
+    -bairro : String
+    -cidade : String
+    -estado : String
+    -cep : String
+    -pais : String
+}
+
+class Curso {
+    -id : Int
+    -nome : String
+    -nivel : String
+}
+
+class Conta {
+    -id : Int
+    -saldo : Double
+}
+
+class Transacao {
+    -id : Int
+    -dataHora : DateTime
+    -valor : Double
+    -descricao : String
+    -tipo : TipoTransacao
+}
+
+class Vantagem {
+    -id : Int
+    -titulo : String
+    -descricao : String
+    -custoMoedas : Double
+    -fotoUrl : String
+    -ativa : Boolean
+}
+
+class CupomResgate {
+    -id : Int
+    -codigo : String
+    -dataGeracao : DateTime
+    -status : StatusCupom
+}
+
+' =========================
+' ENUMS
+' =========================
+
+enum TipoTransacao {
+    CREDITO
+    DEBITO
+    TRANSFERENCIA
+}
+
+enum StatusCupom {
+    GERADO
+    UTILIZADO
+    CANCELADO
+    EXPIRADO
+}
+
+enum TipoUsuario {
+    ALUNO
+    PROFESSOR
+    EMPRESA_PARCEIRA
+    ADMIN
+}
+
+' =========================
+' HERANÇA
+' =========================
+
+Usuario <|-- Aluno
+Usuario <|-- Professor
+Usuario <|-- EmpresaParceira
+
+' =========================
+' RELACIONAMENTOS
+' =========================
+
+' Endereço
+Usuario "1" *-- "1" Endereco
+InstituicaoEnsino "1" *-- "1" Endereco
+
+' Instituição
+InstituicaoEnsino "1" -- "0..*" Aluno
+InstituicaoEnsino "1" -- "0..*" Professor
+InstituicaoEnsino "1" -- "1..*" Curso
+
+' Curso
+Curso "1" -- "0..*" Aluno
+Curso "0..*" -- "0..*" Professor
+
+' Conta
+Aluno "1" *-- "1" Conta
+Professor "1" *-- "1" Conta
+
+' Transações
+Conta "1" -- "0..*" Transacao
+
+' Empresa e vantagens
+EmpresaParceira "1" -- "0..*" Vantagem
+
+' Resgates
+Aluno "1" -- "0..*" CupomResgate
+Vantagem "1" -- "0..*" CupomResgate
+EmpresaParceira "1" -- "0..*" CupomResgate
+CupomResgate "1" -- "1" Transacao
+
+' =========================
+' ENUMS RELACIONADOS
+' =========================
+
+Usuario --> TipoUsuario
+Transacao --> TipoTransacao
+CupomResgate --> StatusCupom
+
+@enduml
