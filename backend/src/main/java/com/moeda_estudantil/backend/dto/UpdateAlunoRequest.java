@@ -6,10 +6,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RegisterAlunoRequest {
+public class UpdateAlunoRequest {
     private String nome;
-    private String email;
-    private String senha;
     private String cpf;
     private String rg;
     private String matricula;

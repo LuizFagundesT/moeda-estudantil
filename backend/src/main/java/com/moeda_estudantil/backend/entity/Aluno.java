@@ -1,6 +1,5 @@
 package com.moeda_estudantil.backend.entity;
 
-import com.moeda_estudantil.backend.entity.Usuario;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -10,4 +9,7 @@ public class Aluno extends Usuario {
 
     private String matricula;
     private String rg;
+    private String curso;
+    private String instituicao;
+    private Double saldoMoedas = 0.0;
 }

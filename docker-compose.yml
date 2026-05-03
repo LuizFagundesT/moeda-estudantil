@@ -26,6 +26,8 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    environment:
+      - SPRING_AUTOCONFIGURE_EXCLUDE=org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
     depends_on:
       db:
         condition: service_healthy

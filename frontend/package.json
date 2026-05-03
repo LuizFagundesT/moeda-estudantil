@@ -12,6 +12,7 @@
   "dependencies": {
     "@splinetool/react-spline": "^4.1.0",
     "@tailwindcss/vite": "^4.1.0",
+    "axios": "^1.16.0",
     "bootstrap": "^5.3.8",
     "react": "^19.2.5",
     "react-bootstrap": "^2.10.10",

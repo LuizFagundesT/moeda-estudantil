@@ -288,15 +288,24 @@ const styles = `
 
 function FormAluno({ onSubmit }) {
   const [form, setForm] = useState({
-    nome: "",
-    email: "",
-    cpf: "",
-    curso: "",
-    senha: "",
+    nome: "", email: "", senha: "",
+    cpf: "", rg: "", matricula: "",
+    curso: "", instituicao: "",
+    endereco: {
+      logradouro: "", numero: "", complemento: "",
+      bairro: "", cidade: "", estado: "", cep: "", pais: "Brasil",
+    },
   });
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  function handleEndereco(e) {
+    setForm({
+      ...form,
+      endereco: { ...form.endereco, [e.target.name]: e.target.value },
+    });
   }
 
   function handleSubmit(e) {
@@ -309,66 +318,132 @@ function FormAluno({ onSubmit }) {
       <p className="cad-title">Cadastro do Aluno</p>
       <p className="cad-sub">Crie sua conta e aproveite benefícios</p>
 
+      {/* Nome */}
       <div className="cad-field">
         <label className="cad-label">Nome completo</label>
-        <input
-          className="cad-input"
-          name="nome"
-          placeholder="Seu nome"
-          onChange={handleChange}
-          required
-        />
+        <input className="cad-input" name="nome"
+          placeholder="Seu nome completo"
+          value={form.nome} onChange={handleChange} required />
+      </div>
+
+      {/* Email + CPF */}
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">Email</label>
+          <input className="cad-input" type="email" name="email"
+            placeholder="email@email.com"
+            value={form.email} onChange={handleChange} required />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">CPF</label>
+          <input className="cad-input" name="cpf"
+            placeholder="000.000.000-00"
+            value={form.cpf} onChange={handleChange} required />
+        </div>
+      </div>
+
+      {/* RG + Matrícula */}
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">RG</label>
+          <input className="cad-input" name="rg"
+            placeholder="00.000.000-0"
+            value={form.rg} onChange={handleChange} required />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">Matrícula</label>
+          <input className="cad-input" name="matricula"
+            placeholder="Sua matrícula"
+            value={form.matricula} onChange={handleChange} required />
+        </div>
+      </div>
+
+      {/* Curso + Instituição */}
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">Curso</label>
+          <input className="cad-input" name="curso"
+            placeholder="Ex: Ciência da Computação"
+            value={form.curso} onChange={handleChange} required />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">Instituição</label>
+          <input className="cad-input" name="instituicao"
+            placeholder="Nome da instituição"
+            value={form.instituicao} onChange={handleChange} required />
+        </div>
+      </div>
+
+      <div className="cad-divider" />
+
+      {/* Endereço */}
+      <div className="cad-field">
+        <label className="cad-label">CEP</label>
+        <input className="cad-input" name="cep"
+          placeholder="00000-000"
+          value={form.endereco.cep} onChange={handleEndereco} required />
       </div>
 
       <div className="cad-row">
         <div className="cad-field">
-          <label className="cad-label">Email</label>
-          <input
-            className="cad-input"
-            type="email"
-            name="email"
-            placeholder="email@email.com"
-            onChange={handleChange}
-            required
-          />
+          <label className="cad-label">Logradouro</label>
+          <input className="cad-input" name="logradouro"
+            placeholder="Rua, Av..."
+            value={form.endereco.logradouro} onChange={handleEndereco} required />
         </div>
-
         <div className="cad-field">
-          <label className="cad-label">CPF</label>
-          <input
-            className="cad-input"
-            name="cpf"
-            placeholder="000.000.000-00"
-            onChange={handleChange}
-            required
-          />
+          <label className="cad-label">Número</label>
+          <input className="cad-input" name="numero"
+            placeholder="123"
+            value={form.endereco.numero} onChange={handleEndereco} required />
         </div>
       </div>
 
-      <div className="cad-field">
-        <label className="cad-label">Curso</label>
-        <input
-          className="cad-input"
-          name="curso"
-          placeholder="Seu curso"
-          onChange={handleChange}
-          required
-        />
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">Bairro</label>
+          <input className="cad-input" name="bairro"
+            placeholder="Bairro"
+            value={form.endereco.bairro} onChange={handleEndereco} required />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">Cidade</label>
+          <input className="cad-input" name="cidade"
+            placeholder="Cidade"
+            value={form.endereco.cidade} onChange={handleEndereco} required />
+        </div>
       </div>
 
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">Estado</label>
+          <input className="cad-input" name="estado"
+            placeholder="UF"
+            value={form.endereco.estado} onChange={handleEndereco} required />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">Complemento</label>
+          <input className="cad-input" name="complemento"
+            placeholder="Apto, Bloco..."
+            value={form.endereco.complemento} onChange={handleEndereco} />
+        </div>
+      </div>
+
+      <div className="cad-divider" />
+
+      {/* Senha */}
       <div className="cad-field">
         <label className="cad-label">Senha</label>
-        <input
-          className="cad-input"
-          type="password"
-          name="senha"
+        <input className="cad-input" type="password" name="senha"
           placeholder="********"
-          onChange={handleChange}
-          required
-        />
+          value={form.senha} onChange={handleChange} required />
       </div>
 
-      <button className="cad-btn">Criar conta</button>
+      <button className="cad-btn" type="submit">Criar conta</button>
+
+      <p className="cad-footer-text">
+        Já tem conta? <a href="/login">Entrar</a>
+      </p>
     </form>
   );
 }

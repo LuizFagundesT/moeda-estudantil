@@ -27,6 +27,10 @@ public class AuthService {
     }
 
     public void registerAluno(RegisterAlunoRequest dto) {
+           // Verifica se email já existe
+    if (repository.findByEmail(dto.getEmail()).isPresent()) {
+        throw new RuntimeException("Email já cadastrado.");
+    }
         Aluno aluno = new Aluno();
         aluno.setNome(dto.getNome());
         aluno.setEmail(dto.getEmail());
@@ -34,6 +38,9 @@ public class AuthService {
         aluno.setCpf(dto.getCpf());
         aluno.setMatricula(dto.getMatricula());
         aluno.setRg(dto.getRg());
+        aluno.setCurso(dto.getCurso());
+        aluno.setInstituicao(dto.getInstituicao());
+        aluno.setSaldoMoedas(0.0);
         aluno.setEndereco(dto.getEndereco());
         aluno.setTipo(TipoUsuario.ALUNO);
         repository.save(aluno);

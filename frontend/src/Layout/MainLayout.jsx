@@ -13,7 +13,7 @@ export default function MainLayout() {
       <Header />
 
       <main style={{
-        flex: 1,paddingTop: '0px'
+        flex: 1,paddingTop: '96px'
       }}>
         <Outlet />
       </main>

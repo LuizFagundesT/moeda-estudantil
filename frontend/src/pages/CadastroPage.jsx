@@ -1,18 +1,17 @@
+import { useNavigate } from "react-router-dom";
 import Spline from "@splinetool/react-spline";
-import CadastroCard from "../components/CadastroCard"; // ajuste o caminho se necessário
+import CadastroCard from "../components/CadastroCard";
+import { alunoService } from "../services/alunoService";
 
 const pageStyles = `
   .cadastro-page {
     position: relative;
     width: 100%;
-    height: 100vh;
-    overflow: hidden;
     background: linear-gradient(135deg, #eef3ff 0%, #dfe8ff 100%);
   }
 
-  /* spline no fundo */
   .cadastro-spline {
-    position: absolute;
+    position: fixed;
     inset: 0;
     z-index: 1;
   }
@@ -22,41 +21,44 @@ const pageStyles = `
     height: 100% !important;
   }
 
-  /* conteúdo acima */
   .cadastro-content {
     position: relative;
     z-index: 2;
     width: 100%;
-    height: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-end;
-    padding: 350px 180px;
+    padding: 20px 180px 60px 180px;
   }
 
   @media (max-width: 1024px) {
     .cadastro-content {
       justify-content: center;
-      padding: 30px;
+      padding: 20px 30px 60px 30px;
     }
   }
 
   @media (max-width: 768px) {
-    .cadastro-page {
-      height: auto;
-      min-height: 100vh;
-    }
-
     .cadastro-content {
-      padding: 20px;
+      padding: 20px 20px 60px 20px;
     }
   }
 `;
 
 export default function CadastroPage() {
-  function handleCadastro(tipo, dados) {
-    console.log("Tipo:", tipo);
-    console.log("Dados:", dados);
+  const navigate = useNavigate();
+
+  async function handleCadastro(tipo, dados) {
+    try {
+      if (tipo === "aluno") {
+        await alunoService.cadastrar(dados);
+        alert("Cadastro realizado! Faça login para continuar.");
+        navigate("/login");
+      }
+      // empresa: implementar depois
+    } catch (err) {
+      alert(err.response?.data?.message || "Erro ao cadastrar. Tente novamente.");
+    }
   }
 
   return (
@@ -64,12 +66,10 @@ export default function CadastroPage() {
       <style>{pageStyles}</style>
 
       <main className="cadastro-page">
-        {/* Fundo 3D */}
         <div className="cadastro-spline">
           <Spline scene="https://prod.spline.design/7lUdd58BSxMkb31m/scene.splinecode" />
         </div>
 
-        {/* Card à direita */}
         <div className="cadastro-content">
           <CadastroCard onSubmit={handleCadastro} />
         </div>
