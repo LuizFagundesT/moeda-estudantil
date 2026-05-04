@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("*")
+//@CrossOrigin("*")  // remover para rodar qualquer porta sem dar erro
 public class AuthController {
 
     private final AuthService service;
