@@ -1,20 +1,18 @@
 package com.moeda_estudantil.backend.dto;
 
 import com.moeda_estudantil.backend.entity.Endereco;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
-
-@Data
 @Getter
 @Setter
-public class RegisterAlunoRequest {
+public class CreateEmpresaRequest {
+
     private String nome;
     private String email;
     private String senha;
     private String cpf;
-    private String rg;
-    private String matricula;
-    private String curso;
-    private String instituicao;
+    private String cnpj;
+    private String nomeFantasia;
     private Endereco endereco;
 }

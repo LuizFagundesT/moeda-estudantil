@@ -55,17 +55,18 @@ const pageStyles = `
 export default function Login() {
   const navigate = useNavigate();
 
-  async function handleLogin(form) {
+    async function handleLogin(form) {
     try {
       const { data } = await alunoService.login({
         email: form.email,
         senha: form.senha,
       });
 
-      // Salva token + dados do usuário no localStorage
       localStorage.setItem("usuarioLogado", JSON.stringify(data));
 
-      // Redireciona pelo tipo de usuário
+      
+      window.dispatchEvent(new Event("usuarioLogado"));
+
       if (data.tipo === "ALUNO") {
         navigate("/aluno/dashboard");
       } else if (data.tipo === "PROFESSOR") {

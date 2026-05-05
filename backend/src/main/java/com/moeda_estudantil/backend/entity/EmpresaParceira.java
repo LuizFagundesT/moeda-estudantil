@@ -2,10 +2,13 @@ package com.moeda_estudantil.backend.entity;
 
 import jakarta.persistence.*;
 import com.moeda_estudantil.backend.entity.Usuario;
-import lombok.Data;
 
+import lombok.*;
+
+@Getter
+@Setter
 @Entity
-@Data
+
 public class EmpresaParceira extends Usuario {
 
     private String cnpj;

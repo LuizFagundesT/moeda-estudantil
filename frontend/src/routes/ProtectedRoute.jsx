@@ -1,15 +1,25 @@
-import { Navigate } from "react-router-dom"
+import { Navigate, useLocation } from "react-router-dom";
 
-export default function ProtectedRoute ({children, tipoPermitido}){
-    const usuario = JSON.parse(localStorage.getItem('usuarioLogado'))
+const DASHBOARD_POR_TIPO = {
+  ALUNO: "/aluno/dashboard",
+  PROFESSOR: "/professor/dashboard",
+  EMPRESA: "/empresa/dashboard",
+};
 
-    if(!usuario){
-        return(<Navigate to='/'/>)
-    }
+export default function ProtectedRoute({ children, tipoPermitido }) {
+  const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+  const location = useLocation();
 
-    if(tipoPermitido && usuario.tipoUsuario!== tipoPermitido){
-        return <Navigate to='/'/>
-    }
+  // Não logado → vai para /login e guarda a rota que tentou acessar
+  if (!usuario) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
-    return children
+  // Tipo errado → redireciona para o dashboard correto
+  if (tipoPermitido && usuario.tipo !== tipoPermitido) {
+    const destino = DASHBOARD_POR_TIPO[usuario.tipo] ?? "/";
+    return <Navigate to={destino} replace />;
+  }
+
+  return children;
 }
