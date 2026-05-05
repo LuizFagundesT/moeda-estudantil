@@ -23,7 +23,7 @@ export default function AppRoutes() {
           </ProtectedRoute>
         } />
 
-        {/* TODO: Professor e Empresa (adicionar quando criar as páginas) */}
+        {/* TODO: Professor e Empresa */}
       </Route>
     </Routes>
   );

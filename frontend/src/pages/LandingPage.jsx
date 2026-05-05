@@ -8,7 +8,7 @@ export default function LandingPage() {
         scene="https://prod.spline.design/TsHWWgTZbsH98Yz5/scene.splinecode"
       />
 
-      <div>teste de FONT</div>
+      
     </>
   );
 }

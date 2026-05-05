@@ -450,19 +450,65 @@ function FormAluno({ onSubmit }) {
 
 function FormEmpresa({ onSubmit }) {
   const [form, setForm] = useState({
-    empresa: "",
+    nome: "",
+    nomeFantasia: "",
+    cpf: "",
     cnpj: "",
     email: "",
     senha: "",
+    endereco: {
+      logradouro: "",
+      numero: "",
+      complemento: "",
+      bairro: "",
+      cidade: "",
+      estado: "",
+      cep: "",
+      pais: "Brasil",
+    },
   });
+
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState(null);
+  const [sucesso, setSucesso] = useState(false);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e) {
+  function handleEndereco(e) {
+    setForm({
+      ...form,
+      endereco: { ...form.endereco, [e.target.name]: e.target.value },
+    });
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    onSubmit?.("empresa", form);
+    setLoading(true);
+    setErro(null);
+    setSucesso(false);
+
+    try {
+      const response = await fetch("http://localhost:8080/empresas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (!response.ok) {
+        const msg = await response.text();
+        throw new Error(msg || "Erro ao cadastrar empresa");
+      }
+
+      const data = await response.json();
+      setSucesso(true);
+      onSubmit?.("empresa", data);
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -471,14 +517,40 @@ function FormEmpresa({ onSubmit }) {
       <p className="cad-sub">Cadastre sua empresa parceira</p>
 
       <div className="cad-field">
-        <label className="cad-label">Empresa</label>
+        <label className="cad-label">Nome do responsável</label>
         <input
           className="cad-input"
-          name="empresa"
-          placeholder="Nome da empresa"
+          name="nome"
+          placeholder="Nome completo do responsável"
+          value={form.nome}
           onChange={handleChange}
           required
         />
+      </div>
+
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">Nome fantasia</label>
+          <input
+            className="cad-input"
+            name="nomeFantasia"
+            placeholder="Ex: XPTO Soluções"
+            value={form.nomeFantasia}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">CPF do responsável</label>
+          <input
+            className="cad-input"
+            name="cpf"
+            placeholder="000.000.000-00"
+            value={form.cpf}
+            onChange={handleChange}
+            required
+          />
+        </div>
       </div>
 
       <div className="cad-field">
@@ -487,6 +559,7 @@ function FormEmpresa({ onSubmit }) {
           className="cad-input"
           name="cnpj"
           placeholder="00.000.000/0001-00"
+          value={form.cnpj}
           onChange={handleChange}
           required
         />
@@ -499,10 +572,102 @@ function FormEmpresa({ onSubmit }) {
           type="email"
           name="email"
           placeholder="empresa@email.com"
+          value={form.email}
           onChange={handleChange}
           required
         />
       </div>
+
+      <div className="cad-divider" />
+
+      {/* Endereço */}
+      <div className="cad-field">
+        <label className="cad-label">CEP</label>
+        <input
+          className="cad-input"
+          name="cep"
+          placeholder="00000-000"
+          value={form.endereco.cep}
+          onChange={handleEndereco}
+          required
+        />
+      </div>
+
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">Logradouro</label>
+          <input
+            className="cad-input"
+            name="logradouro"
+            placeholder="Rua, Av..."
+            value={form.endereco.logradouro}
+            onChange={handleEndereco}
+            required
+          />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">Número</label>
+          <input
+            className="cad-input"
+            name="numero"
+            placeholder="123"
+            value={form.endereco.numero}
+            onChange={handleEndereco}
+            required
+          />
+        </div>
+      </div>
+
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">Bairro</label>
+          <input
+            className="cad-input"
+            name="bairro"
+            placeholder="Bairro"
+            value={form.endereco.bairro}
+            onChange={handleEndereco}
+            required
+          />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">Cidade</label>
+          <input
+            className="cad-input"
+            name="cidade"
+            placeholder="Cidade"
+            value={form.endereco.cidade}
+            onChange={handleEndereco}
+            required
+          />
+        </div>
+      </div>
+
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">Estado</label>
+          <input
+            className="cad-input"
+            name="estado"
+            placeholder="UF"
+            value={form.endereco.estado}
+            onChange={handleEndereco}
+            required
+          />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">Complemento</label>
+          <input
+            className="cad-input"
+            name="complemento"
+            placeholder="Apto, Bloco..."
+            value={form.endereco.complemento}
+            onChange={handleEndereco}
+          />
+        </div>
+      </div>
+
+      <div className="cad-divider" />
 
       <div className="cad-field">
         <label className="cad-label">Senha</label>
@@ -511,12 +676,27 @@ function FormEmpresa({ onSubmit }) {
           type="password"
           name="senha"
           placeholder="********"
+          value={form.senha}
           onChange={handleChange}
           required
         />
       </div>
 
-      <button className="cad-btn">Solicitar parceria</button>
+      {erro && (
+        <p style={{ color: "#A32D2D", fontSize: 12, fontFamily: "Play, sans-serif", textAlign: "center" }}>
+          {erro}
+        </p>
+      )}
+
+      {sucesso && (
+        <p style={{ color: "#0F6E56", fontSize: 12, fontFamily: "Play, sans-serif", textAlign: "center" }}>
+          Empresa cadastrada com sucesso!
+        </p>
+      )}
+
+      <button className="cad-btn" type="submit" disabled={loading} onClick={handleSubmit}>
+  {loading ? "Cadastrando..." : "Cadastrar empresa"}
+</button>
     </form>
   );
 }

@@ -4,12 +4,14 @@ import { alunoService } from "../services/alunoService";
 
 const styles = `
   .dashboard {
+    
     min-height: 100vh;
     background: linear-gradient(135deg, #eef3ff 0%, #dfe8ff 100%);
     padding: 40px;
     font-family: 'Play', sans-serif;
   }
   .dashboard-header {
+  
     display: flex;
     justify-content: space-between;
     align-items: center;
