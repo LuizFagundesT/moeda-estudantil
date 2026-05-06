@@ -4,6 +4,7 @@ const DASHBOARD_POR_TIPO = {
   ALUNO: "/aluno/dashboard",
   PROFESSOR: "/professor/dashboard",
   EMPRESA: "/empresa/dashboard",
+  EMPRESA_PARCEIRA: "/empresa/dashboard",
 };
 
 export default function ProtectedRoute({ children, tipoPermitido }) {

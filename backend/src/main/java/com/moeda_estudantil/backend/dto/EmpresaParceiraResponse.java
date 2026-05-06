@@ -1,6 +1,7 @@
 package com.moeda_estudantil.backend.dto;
 
 import com.moeda_estudantil.backend.entity.EmpresaParceira;
+import com.moeda_estudantil.backend.entity.Endereco;
 import lombok.*;
 
 @Getter
@@ -16,6 +17,7 @@ public class EmpresaParceiraResponse {
     private String cpf;
     private String cnpj;
     private String nomeFantasia;
+    private Endereco endereco;
 
     public static EmpresaParceiraResponse fromEntity(EmpresaParceira empresa) {
         return EmpresaParceiraResponse.builder()
@@ -25,6 +27,7 @@ public class EmpresaParceiraResponse {
                 .cpf(empresa.getCpf())
                 .cnpj(empresa.getCnpj())
                 .nomeFantasia(empresa.getNomeFantasia())
+                .endereco(empresa.getEndereco())
                 .build();
     }
 }

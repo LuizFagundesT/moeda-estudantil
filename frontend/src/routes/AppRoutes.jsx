@@ -6,6 +6,7 @@ import LandingPage from "../pages/LandingPage";
 import Login from "../pages/Login";
 import CadastroPage from "../pages/CadastroPage";
 import AlunoDashboard from "../pages/AlunoDashboard";
+import EmpresaDashboard from "../pages/EmpresaDashboard";
 
 export default function AppRoutes() {
   return (
@@ -23,7 +24,14 @@ export default function AppRoutes() {
           </ProtectedRoute>
         } />
 
-        {/* TODO: Professor e Empresa */}
+        {/* Protegidas — Empresa Parceira */}
+        <Route path="/empresa/dashboard" element={
+          <ProtectedRoute tipoPermitido="EMPRESA_PARCEIRA">
+            <EmpresaDashboard />
+          </ProtectedRoute>
+        } />
+
+        {/* TODO: Professor */}
       </Route>
     </Routes>
   );

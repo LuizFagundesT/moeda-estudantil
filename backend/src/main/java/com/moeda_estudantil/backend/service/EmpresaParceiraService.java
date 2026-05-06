@@ -2,15 +2,12 @@ package com.moeda_estudantil.backend.service;
 
 import com.moeda_estudantil.backend.dto.EmpresaParceiraResponse;
 import com.moeda_estudantil.backend.dto.UpdateEmpresaParceiraRequest;
-import com.moeda_estudantil.backend.entity.EmpresaParceira;
-import com.moeda_estudantil.backend.repository.EmpresaParceiraRepository;
-import org.springframework.stereotype.Service;
 import com.moeda_estudantil.backend.dto.CreateEmpresaRequest;
 import com.moeda_estudantil.backend.entity.EmpresaParceira;
-import com.moeda_estudantil.backend.entity.Usuario;
 import com.moeda_estudantil.backend.enums.TipoUsuario;
+import com.moeda_estudantil.backend.repository.EmpresaParceiraRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -45,12 +42,16 @@ public class EmpresaParceiraService {
 
         if (dto.getNome() != null)
             empresa.setNome(dto.getNome());
+        if (dto.getEmail() != null)
+            empresa.setEmail(dto.getEmail());
         if (dto.getCpf() != null)
             empresa.setCpf(dto.getCpf());
         if (dto.getCnpj() != null)
             empresa.setCnpj(dto.getCnpj());
         if (dto.getNomeFantasia() != null)
             empresa.setNomeFantasia(dto.getNomeFantasia());
+        if (dto.getEndereco() != null)
+            empresa.setEndereco(dto.getEndereco());
 
         return EmpresaParceiraResponse.fromEntity(repository.save(empresa));
     }
