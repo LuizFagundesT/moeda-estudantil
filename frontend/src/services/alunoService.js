@@ -25,4 +25,7 @@ export const alunoService = {
   // Deletar
   deletar: (id) =>
     api.delete(`/alunos/${id}`),
+
+  extrato: (id) =>
+    api.get(`/alunos/${id}/extrato`),
 };

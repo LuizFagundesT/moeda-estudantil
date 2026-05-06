@@ -8,10 +8,6 @@ import lombok.Setter;
 @Setter
 public class UpdateAlunoRequest {
     private String nome;
-    private String cpf;
-    private String rg;
-    private String matricula;
     private String curso;
-    private String instituicao;
     private Endereco endereco;
 }
