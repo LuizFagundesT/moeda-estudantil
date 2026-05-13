@@ -2,37 +2,30 @@ import { useState } from "react";
 
 const styles = `
   .login-wrapper {
-    width: 520px;
+    width: 460px;
     flex-shrink: 0;
     margin-left: auto;
   }
 
-  /* ───────── CARD GLASS ───────── */
   .login-card {
     position: relative;
     overflow: hidden;
-    border-radius: 28px;
-
-    background: rgba(220, 232, 248, 0.34);
+    border-radius: 26px;
+    background: rgba(220,232,248,0.38);
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
-
-    border: 1px solid rgba(255,255,255,0.45);
-
+    border: 1px solid rgba(255,255,255,0.48);
     box-shadow:
-      0 8px 40px rgba(83, 74, 183, 0.14),
-      0 1px 0 rgba(255,255,255,0.65) inset,
-      0 -1px 0 rgba(83,74,183,0.08) inset;
+      0 8px 40px rgba(83,74,183,.14),
+      0 1px 0 rgba(255,255,255,.65) inset,
+      0 -1px 0 rgba(83,74,183,.08) inset;
   }
 
   .login-card::before {
     content: "";
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(circle at top left,
-      rgba(255,255,255,0.45),
-      transparent 42%);
+    background: radial-gradient(circle at top left, rgba(255,255,255,.45), transparent 42%);
     pointer-events: none;
   }
 
@@ -44,100 +37,98 @@ const styles = `
     top: -60px;
     right: -40px;
     border-radius: 50%;
-    background: radial-gradient(
-      circle,
-      rgba(127,119,221,0.25),
-      transparent 70%
-    );
-    filter: blur(12px);
+    background: radial-gradient(circle, rgba(127,119,221,.22), transparent 70%);
+    filter: blur(14px);
     pointer-events: none;
   }
 
-  /* ───────── BODY ───────── */
   .login-body {
-    padding: 34px;
+    padding: 36px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .login-header {
+    margin-bottom: 4px;
   }
 
   .login-title {
     font-family: 'Play', sans-serif;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
     color: #26215C;
-    margin: 0;
+    margin: 0 0 6px;
   }
 
   .login-sub {
     font-family: 'Play', sans-serif;
     font-size: 13px;
-    color: rgba(83,74,183,.65);
-    margin-bottom: 10px;
+    color: rgba(83,74,183,.6);
+    margin: 0;
   }
 
-  /* ───────── INPUTS ───────── */
   .login-field {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 7px;
   }
 
   .login-label {
     font-family: 'Play', sans-serif;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
     color: rgba(60,52,137,.72);
   }
 
   .login-input {
     width: 100%;
+    box-sizing: border-box;
     outline: none;
     padding: 14px 16px;
-    border-radius: 14px;
-
-    border: 1px solid rgba(255,255,255,.35);
-    background: rgba(255,255,255,.30);
-
+    border-radius: 13px;
+    border: 1px solid rgba(255,255,255,.38);
+    background: rgba(255,255,255,.32);
     font-family: 'Play', sans-serif;
     font-size: 14px;
     color: #26215C;
-
-    transition: all .25s ease;
+    transition: all .22s ease;
   }
 
-  .login-input::placeholder {
-    color: rgba(83,74,183,.38);
-  }
+  .login-input::placeholder { color: rgba(83,74,183,.38); }
 
   .login-input:focus {
-    background: rgba(255,255,255,.48);
+    background: rgba(255,255,255,.52);
     border-color: rgba(83,74,183,.35);
-
-    box-shadow:
-      0 0 0 4px rgba(83,74,183,.08),
-      0 6px 18px rgba(83,74,183,.08);
+    box-shadow: 0 0 0 4px rgba(83,74,183,.08);
   }
 
-  /* ───────── OPTIONS ───────── */
-  .login-options {
+  .login-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    margin-top: -2px;
   }
 
   .login-check {
     display: flex;
     align-items: center;
     gap: 8px;
-
     font-family: 'Play', sans-serif;
     font-size: 12px;
-    color: rgba(83,74,183,.72);
+    color: rgba(83,74,183,.65);
+    cursor: pointer;
+  }
+
+  .login-check input[type="checkbox"] {
+    accent-color: #534AB7;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
   }
 
   .login-link {
@@ -146,81 +137,62 @@ const styles = `
     color: #534AB7;
     text-decoration: none;
     font-weight: 700;
+    transition: color .15s;
   }
 
-  .login-link:hover {
-    color: #26215C;
-  }
+  .login-link:hover { color: #26215C; }
 
-  /* ───────── BUTTON ───────── */
   .login-btn {
     border: none;
     cursor: pointer;
     width: 100%;
-    margin-top: 8px;
-
     padding: 15px;
-    border-radius: 14px;
-
+    border-radius: 13px;
     font-family: 'Play', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-
     color: #fff;
-    background: linear-gradient(
-      135deg,
-      #534AB7,
-      #7F77DD
-    );
-
-    box-shadow:
-      0 10px 24px rgba(83,74,183,.30);
-
-    transition: all .25s ease;
+    background: linear-gradient(135deg, #534AB7, #7F77DD);
+    box-shadow: 0 10px 24px rgba(83,74,183,.28);
+    transition: all .22s ease;
+    margin-top: 4px;
   }
 
   .login-btn:hover {
     transform: translateY(-2px);
-    box-shadow:
-      0 14px 30px rgba(83,74,183,.42);
+    box-shadow: 0 14px 30px rgba(83,74,183,.38);
   }
 
-  /* ───────── FOOTER ───────── */
+  .login-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(175,169,236,.4), transparent);
+    margin: 2px 0;
+  }
+
   .login-footer {
     text-align: center;
     font-family: 'Play', sans-serif;
     font-size: 12px;
     color: rgba(83,74,183,.55);
-    margin-top: 6px;
   }
 
   .login-footer a {
     color: #534AB7;
     text-decoration: none;
     font-weight: 700;
+    transition: color .15s;
   }
 
-  .login-footer a:hover {
-    color: #26215C;
+  .login-footer a:hover { color: #26215C; }
+
+  @keyframes kn-slide-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ───────── ANIMATION ───────── */
-  .login-enter {
-    animation: fadeSlideIn .28s ease;
-  }
-
-  @keyframes fadeSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  .login-enter { animation: kn-slide-in .28s ease; }
 
   @media (max-width: 768px) {
     .login-wrapper {
@@ -228,23 +200,17 @@ const styles = `
       max-width: 420px;
       margin: 0 auto;
     }
+
+    .login-body { padding: 28px; }
   }
 `;
 
 export default function LoginCard({ onSubmit }) {
-  const [form, setForm] = useState({
-    email: "",
-    senha: "",
-    lembrar: false,
-  });
+  const [form, setForm] = useState({ email: "", senha: "", lembrar: false });
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
-
-    setForm({
-      ...form,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   }
 
   function handleSubmit(e) {
@@ -259,10 +225,11 @@ export default function LoginCard({ onSubmit }) {
       <div className="login-wrapper">
         <div className="login-card">
           <form className="login-body login-enter" onSubmit={handleSubmit}>
-            <h2 className="login-title">Entrar</h2>
-            <p className="login-sub">
-              Acesse sua conta e continue sua jornada.
-            </p>
+
+            <div className="login-header">
+              <h2 className="login-title">Acessar conta</h2>
+              <p className="login-sub">Insira suas credenciais para continuar.</p>
+            </div>
 
             <div className="login-field">
               <label className="login-label">E-mail</label>
@@ -283,14 +250,14 @@ export default function LoginCard({ onSubmit }) {
                 className="login-input"
                 type="password"
                 name="senha"
-                placeholder="********"
+                placeholder="••••••••"
                 value={form.senha}
                 onChange={handleChange}
                 required
               />
             </div>
 
-            <div className="login-options">
+            <div className="login-row">
               <label className="login-check">
                 <input
                   type="checkbox"
@@ -300,19 +267,17 @@ export default function LoginCard({ onSubmit }) {
                 />
                 Lembrar-me
               </label>
-
-              <a href="/recuperar-senha" className="login-link">
-                Esqueci senha
-              </a>
+              <a href="/recuperar-senha" className="login-link">Esqueci a senha</a>
             </div>
 
-            <button className="login-btn" type="submit">
-              Entrar
-            </button>
+            <div className="login-divider" />
+
+            <button className="login-btn" type="submit">Entrar</button>
 
             <p className="login-footer">
               Não possui conta? <a href="/cadastro">Criar conta</a>
             </p>
+
           </form>
         </div>
       </div>

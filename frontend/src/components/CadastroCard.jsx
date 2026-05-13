@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "../pages/Toast";
 
 const styles = `
   .cad-wrapper {
@@ -7,120 +8,98 @@ const styles = `
     margin-left: auto;
   }
 
-  /* ───────── CARD GLASS ───────── */
   .cad-card {
     position: relative;
     overflow: hidden;
-    border-radius: 28px;
-
-    background: rgba(220, 232, 248, 0.34);
+    border-radius: 26px;
+    background: rgba(220,232,248,0.38);
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
-
-    border: 1px solid rgba(255,255,255,0.45);
-
+    border: 1px solid rgba(255,255,255,0.48);
     box-shadow:
-      0 8px 40px rgba(83, 74, 183, 0.14),
-      0 1px 0 rgba(255,255,255,0.65) inset,
-      0 -1px 0 rgba(83,74,183,0.08) inset;
+      0 8px 40px rgba(83,74,183,.14),
+      0 1px 0 rgba(255,255,255,.65) inset,
+      0 -1px 0 rgba(83,74,183,.08) inset;
   }
 
   .cad-card::before {
     content: "";
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(circle at top left,
-      rgba(255,255,255,0.45),
-      transparent 42%);
+    background: radial-gradient(circle at top left, rgba(255,255,255,.42), transparent 42%);
     pointer-events: none;
   }
 
-  .cad-card::after {
-    content: "";
-    position: absolute;
-    width: 180px;
-    height: 180px;
-    top: -60px;
-    right: -40px;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle,
-      rgba(127,119,221,0.25),
-      transparent 70%
-    );
-    filter: blur(12px);
-    pointer-events: none;
-  }
-
-  /* ───────── TABS ───────── */
+  /* ── TABS ── */
   .cad-tabs {
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding: 10px;
     gap: 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.18);
+    border-bottom: 1px solid rgba(255,255,255,.2);
+    position: relative;
+    z-index: 1;
   }
 
   .cad-tab {
     border: none;
     cursor: pointer;
-    padding: 14px 0;
-    border-radius: 16px;
-
+    padding: 13px 0;
+    border-radius: 14px;
     font-family: 'Play', sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 1.3px;
     text-transform: uppercase;
-
-    color: rgba(60,52,137,.65);
+    color: rgba(60,52,137,.6);
     background: transparent;
-    transition: all .25s ease;
+    transition: all .22s ease;
   }
 
   .cad-tab:hover {
-    background: rgba(255,255,255,0.22);
+    background: rgba(255,255,255,.22);
     color: #534AB7;
   }
 
   .cad-tab.active {
-    background: linear-gradient(
-      135deg,
-      rgba(83,74,183,.95),
-      rgba(127,119,221,.92)
-    );
+    background: linear-gradient(135deg, rgba(83,74,183,.95), rgba(127,119,221,.92));
     color: #fff;
-
-    box-shadow:
-      0 8px 18px rgba(83,74,183,.28),
-      0 1px 0 rgba(255,255,255,.25) inset;
+    box-shadow: 0 6px 18px rgba(83,74,183,.26), 0 1px 0 rgba(255,255,255,.22) inset;
   }
 
-  /* ───────── BODY ───────── */
+  /* ── BODY ── */
   .cad-body {
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+    padding: 26px 28px 28px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cad-form-header {
+    margin-bottom: 20px;
   }
 
   .cad-title {
     font-family: 'Play', sans-serif;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     color: #26215C;
-    margin-bottom: 2px;
+    margin: 0 0 4px;
   }
 
   .cad-sub {
     font-family: 'Play', sans-serif;
     font-size: 12px;
-    color: rgba(83,74,183,.65);
-    margin-bottom: 8px;
+    color: rgba(83,74,183,.6);
+    margin: 0;
   }
 
-  /* ───────── INPUTS ───────── */
+  /* ── FIELDS ── */
+  .cad-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
   .cad-field {
     display: flex;
     flex-direction: column;
@@ -129,60 +108,42 @@ const styles = `
 
   .cad-label {
     font-family: 'Play', sans-serif;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
-    color: rgba(60,52,137,.72);
+    color: rgba(60,52,137,.68);
   }
 
   .cad-input,
   .cad-select {
     width: 100%;
+    box-sizing: border-box;
     outline: none;
     padding: 12px 14px;
-    border-radius: 14px;
-
-    border: 1px solid rgba(255,255,255,.35);
-    background: rgba(255,255,255,.30);
-
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.38);
+    background: rgba(255,255,255,.32);
     font-family: 'Play', sans-serif;
     font-size: 13px;
     color: #26215C;
-
-    transition: all .25s ease;
+    transition: all .22s ease;
     -webkit-appearance: none;
   }
 
-  .cad-input::placeholder {
-    color: rgba(83,74,183,.38);
-  }
+  .cad-input::placeholder { color: rgba(83,74,183,.38); }
 
   .cad-input:focus,
   .cad-select:focus {
-    background: rgba(255,255,255,.48);
+    background: rgba(255,255,255,.52);
     border-color: rgba(83,74,183,.35);
-
-    box-shadow:
-      0 0 0 4px rgba(83,74,183,.08),
-      0 6px 18px rgba(83,74,183,.08);
+    box-shadow: 0 0 0 4px rgba(83,74,183,.08);
   }
 
   .cad-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-  }
-
-  .cad-divider {
-    height: 1px;
-    margin: 4px 0;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(175,169,236,.45),
-      transparent
-    );
   }
 
   .cad-select-wrap {
@@ -195,49 +156,57 @@ const styles = `
     right: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(83,74,183,.55);
+    color: rgba(83,74,183,.5);
     font-size: 12px;
     pointer-events: none;
   }
 
-  .cad-select {
-    padding-right: 34px;
-    cursor: pointer;
+  .cad-select { padding-right: 34px; cursor: pointer; }
+
+  .cad-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(175,169,236,.4), transparent);
+    margin: 2px 0;
   }
 
-  /* ───────── BUTTON ───────── */
+  .cad-section-label {
+    font-family: 'Play', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(83,74,183,.5);
+    margin: 2px 0 -4px;
+  }
+
+  /* ── BUTTON ── */
   .cad-btn {
     border: none;
     cursor: pointer;
     width: 100%;
-    margin-top: 6px;
-
     padding: 14px;
-    border-radius: 14px;
-
+    border-radius: 13px;
     font-family: 'Play', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-
     color: #fff;
-    background: linear-gradient(
-      135deg,
-      #534AB7,
-      #7F77DD
-    );
-
-    box-shadow:
-      0 10px 24px rgba(83,74,183,.30);
-
-    transition: all .25s ease;
+    background: linear-gradient(135deg, #534AB7, #7F77DD);
+    box-shadow: 0 10px 24px rgba(83,74,183,.28);
+    transition: all .22s ease;
+    margin-top: 4px;
   }
 
   .cad-btn:hover {
     transform: translateY(-2px);
-    box-shadow:
-      0 14px 30px rgba(83,74,183,.42);
+    box-shadow: 0 14px 30px rgba(83,74,183,.38);
+  }
+
+  .cad-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    transform: none;
   }
 
   .cad-footer-text {
@@ -245,55 +214,52 @@ const styles = `
     font-family: 'Play', sans-serif;
     font-size: 12px;
     color: rgba(83,74,183,.55);
-    margin-top: 4px;
+    margin-top: 6px;
   }
 
   .cad-footer-text a {
     color: #534AB7;
     text-decoration: none;
     font-weight: 700;
+    transition: color .15s;
   }
 
-  .cad-footer-text a:hover {
-    color: #26215C;
+  .cad-footer-text a:hover { color: #26215C; }
+
+  @keyframes kn-slide-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  .cad-form-enter {
-    animation: fadeSlideIn .28s ease;
-  }
-
-  @keyframes fadeSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  .cad-form-enter { animation: kn-slide-in .26s ease; }
 
   @media (max-width: 768px) {
-    .cad-wrapper {
-      width: 100%;
-      max-width: 420;
-      margin: 0 auto;
-    }
-
-    .cad-row {
-      grid-template-columns: 1fr;
-    }
+    .cad-wrapper { width: 100%; max-width: 440px; margin: 0 auto; }
+    .cad-row { grid-template-columns: 1fr; }
+    .cad-body { padding: 22px 20px 24px; }
   }
 `;
 
+/* ─── FORM ALUNO ─── */
 function FormAluno({ onSubmit }) {
   const [form, setForm] = useState({
-    nome: "", email: "", senha: "",
-    cpf: "", rg: "", matricula: "",
-    curso: "", instituicao: "",
+    nome: "",
+    email: "",
+    senha: "",
+    cpf: "",
+    rg: "",
+    matricula: "",
+    curso: "",
+    instituicao: "",
     endereco: {
-      logradouro: "", numero: "", complemento: "",
-      bairro: "", cidade: "", estado: "", cep: "", pais: "Brasil",
+      logradouro: "",
+      numero: "",
+      complemento: "",
+      bairro: "",
+      cidade: "",
+      estado: "",
+      cep: "",
+      pais: "Brasil",
     },
   });
 
@@ -314,132 +280,205 @@ function FormAluno({ onSubmit }) {
   }
 
   return (
-    <form className="cad-form-enter" onSubmit={handleSubmit}>
-      <p className="cad-title">Cadastro do Aluno</p>
-      <p className="cad-sub">Crie sua conta e aproveite benefícios</p>
-
-      {/* Nome */}
-      <div className="cad-field">
-        <label className="cad-label">Nome completo</label>
-        <input className="cad-input" name="nome"
-          placeholder="Seu nome completo"
-          value={form.nome} onChange={handleChange} required />
+    <form className="cad-form cad-form-enter" onSubmit={handleSubmit}>
+      <div className="cad-form-header">
+        <p className="cad-title">Cadastro de aluno</p>
+        <p className="cad-sub">Crie sua conta e comece a acumular KRN.</p>
       </div>
 
-      {/* Email + CPF */}
+      <div className="cad-field">
+        <label className="cad-label">Nome completo</label>
+        <input
+          className="cad-input"
+          name="nome"
+          placeholder="Seu nome completo"
+          value={form.nome}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
       <div className="cad-row">
         <div className="cad-field">
-          <label className="cad-label">Email</label>
-          <input className="cad-input" type="email" name="email"
-            placeholder="email@email.com"
-            value={form.email} onChange={handleChange} required />
+          <label className="cad-label">E-mail</label>
+          <input
+            className="cad-input"
+            type="email"
+            name="email"
+            placeholder="seuemail@exemplo.com"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
         </div>
         <div className="cad-field">
           <label className="cad-label">CPF</label>
-          <input className="cad-input" name="cpf"
+          <input
+            className="cad-input"
+            name="cpf"
             placeholder="000.000.000-00"
-            value={form.cpf} onChange={handleChange} required />
+            value={form.cpf}
+            onChange={handleChange}
+            required
+          />
         </div>
       </div>
 
-      {/* RG + Matrícula */}
       <div className="cad-row">
         <div className="cad-field">
           <label className="cad-label">RG</label>
-          <input className="cad-input" name="rg"
+          <input
+            className="cad-input"
+            name="rg"
             placeholder="00.000.000-0"
-            value={form.rg} onChange={handleChange} required />
+            value={form.rg}
+            onChange={handleChange}
+          />
         </div>
         <div className="cad-field">
           <label className="cad-label">Matrícula</label>
-          <input className="cad-input" name="matricula"
-            placeholder="Sua matrícula"
-            value={form.matricula} onChange={handleChange} required />
+          <input
+            className="cad-input"
+            name="matricula"
+            placeholder="Código de matrícula"
+            value={form.matricula}
+            onChange={handleChange}
+          />
         </div>
       </div>
 
-      {/* Curso + Instituição */}
       <div className="cad-row">
         <div className="cad-field">
           <label className="cad-label">Curso</label>
-          <input className="cad-input" name="curso"
-            placeholder="Ex: Ciência da Computação"
-            value={form.curso} onChange={handleChange} required />
+          <input
+            className="cad-input"
+            name="curso"
+            placeholder="Ex.: Ciência da Computação"
+            value={form.curso}
+            onChange={handleChange}
+            required
+          />
         </div>
         <div className="cad-field">
           <label className="cad-label">Instituição</label>
-          <input className="cad-input" name="instituicao"
+          <input
+            className="cad-input"
+            name="instituicao"
             placeholder="Nome da instituição"
-            value={form.instituicao} onChange={handleChange} required />
+            value={form.instituicao}
+            onChange={handleChange}
+            required
+          />
         </div>
       </div>
 
       <div className="cad-divider" />
+      <span className="cad-section-label">Endereço</span>
 
-      {/* Endereço */}
-      <div className="cad-field">
-        <label className="cad-label">CEP</label>
-        <input className="cad-input" name="cep"
-          placeholder="00000-000"
-          value={form.endereco.cep} onChange={handleEndereco} required />
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">CEP</label>
+          <input
+            className="cad-input"
+            name="cep"
+            placeholder="00000-000"
+            value={form.endereco.cep}
+            onChange={handleEndereco}
+            required
+          />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">Número</label>
+          <input
+            className="cad-input"
+            name="numero"
+            placeholder="123"
+            value={form.endereco.numero}
+            onChange={handleEndereco}
+            required
+          />
+        </div>
       </div>
 
       <div className="cad-row">
         <div className="cad-field">
           <label className="cad-label">Logradouro</label>
-          <input className="cad-input" name="logradouro"
+          <input
+            className="cad-input"
+            name="logradouro"
             placeholder="Rua, Av..."
-            value={form.endereco.logradouro} onChange={handleEndereco} required />
+            value={form.endereco.logradouro}
+            onChange={handleEndereco}
+            required
+          />
         </div>
-        <div className="cad-field">
-          <label className="cad-label">Número</label>
-          <input className="cad-input" name="numero"
-            placeholder="123"
-            value={form.endereco.numero} onChange={handleEndereco} required />
-        </div>
-      </div>
-
-      <div className="cad-row">
         <div className="cad-field">
           <label className="cad-label">Bairro</label>
-          <input className="cad-input" name="bairro"
+          <input
+            className="cad-input"
+            name="bairro"
             placeholder="Bairro"
-            value={form.endereco.bairro} onChange={handleEndereco} required />
-        </div>
-        <div className="cad-field">
-          <label className="cad-label">Cidade</label>
-          <input className="cad-input" name="cidade"
-            placeholder="Cidade"
-            value={form.endereco.cidade} onChange={handleEndereco} required />
+            value={form.endereco.bairro}
+            onChange={handleEndereco}
+            required
+          />
         </div>
       </div>
 
       <div className="cad-row">
         <div className="cad-field">
-          <label className="cad-label">Estado</label>
-          <input className="cad-input" name="estado"
-            placeholder="UF"
-            value={form.endereco.estado} onChange={handleEndereco} required />
+          <label className="cad-label">Cidade</label>
+          <input
+            className="cad-input"
+            name="cidade"
+            placeholder="Cidade"
+            value={form.endereco.cidade}
+            onChange={handleEndereco}
+            required
+          />
         </div>
         <div className="cad-field">
-          <label className="cad-label">Complemento</label>
-          <input className="cad-input" name="complemento"
-            placeholder="Apto, Bloco..."
-            value={form.endereco.complemento} onChange={handleEndereco} />
+          <label className="cad-label">Estado</label>
+          <input
+            className="cad-input"
+            name="estado"
+            placeholder="UF"
+            value={form.endereco.estado}
+            onChange={handleEndereco}
+            required
+          />
         </div>
+      </div>
+
+      <div className="cad-field">
+        <label className="cad-label">Complemento</label>
+        <input
+          className="cad-input"
+          name="complemento"
+          placeholder="Apto, Bloco... (opcional)"
+          value={form.endereco.complemento}
+          onChange={handleEndereco}
+        />
       </div>
 
       <div className="cad-divider" />
 
-      {/* Senha */}
       <div className="cad-field">
         <label className="cad-label">Senha</label>
-        <input className="cad-input" type="password" name="senha"
-          placeholder="********"
-          value={form.senha} onChange={handleChange} required />
+        <input
+          className="cad-input"
+          type="password"
+          name="senha"
+          placeholder="••••••••"
+          value={form.senha}
+          onChange={handleChange}
+          required
+        />
       </div>
 
-      <button className="cad-btn" type="submit">Criar conta</button>
+      <button className="cad-btn" type="submit">
+        Criar conta
+      </button>
 
       <p className="cad-footer-text">
         Já tem conta? <a href="/login">Entrar</a>
@@ -448,6 +487,7 @@ function FormAluno({ onSubmit }) {
   );
 }
 
+/* ─── FORM EMPRESA ─── */
 function FormEmpresa({ onSubmit }) {
   const [form, setForm] = useState({
     nome: "",
@@ -469,8 +509,6 @@ function FormEmpresa({ onSubmit }) {
   });
 
   const [loading, setLoading] = useState(false);
-  const [erro, setErro] = useState(null);
-  const [sucesso, setSucesso] = useState(false);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -486,8 +524,6 @@ function FormEmpresa({ onSubmit }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    setErro(null);
-    setSucesso(false);
 
     try {
       const response = await fetch("http://localhost:8080/empresas", {
@@ -502,19 +538,21 @@ function FormEmpresa({ onSubmit }) {
       }
 
       const data = await response.json();
-      setSucesso(true);
+      toast.success("Empresa cadastrada com sucesso!");
       onSubmit?.("empresa", data);
     } catch (err) {
-      setErro(err.message);
+      toast.error(err.message || "Não foi possível cadastrar a empresa.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form className="cad-form-enter" onSubmit={handleSubmit}>
-      <p className="cad-title">Cadastro Empresa</p>
-      <p className="cad-sub">Cadastre sua empresa parceira</p>
+    <form className="cad-form cad-form-enter" onSubmit={handleSubmit}>
+      <div className="cad-form-header">
+        <p className="cad-title">Cadastro de empresa</p>
+        <p className="cad-sub">Registre sua empresa parceira na plataforma.</p>
+      </div>
 
       <div className="cad-field">
         <label className="cad-label">Nome do responsável</label>
@@ -534,7 +572,7 @@ function FormEmpresa({ onSubmit }) {
           <input
             className="cad-input"
             name="nomeFantasia"
-            placeholder="Ex: XPTO Soluções"
+            placeholder="Ex.: XPTO Soluções"
             value={form.nomeFantasia}
             onChange={handleChange}
             required
@@ -553,54 +591,43 @@ function FormEmpresa({ onSubmit }) {
         </div>
       </div>
 
-      <div className="cad-field">
-        <label className="cad-label">CNPJ</label>
-        <input
-          className="cad-input"
-          name="cnpj"
-          placeholder="00.000.000/0001-00"
-          value={form.cnpj}
-          onChange={handleChange}
-          required
-        />
-      </div>
-
-      <div className="cad-field">
-        <label className="cad-label">Email</label>
-        <input
-          className="cad-input"
-          type="email"
-          name="email"
-          placeholder="empresa@email.com"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
+      <div className="cad-row">
+        <div className="cad-field">
+          <label className="cad-label">CNPJ</label>
+          <input
+            className="cad-input"
+            name="cnpj"
+            placeholder="00.000.000/0001-00"
+            value={form.cnpj}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="cad-field">
+          <label className="cad-label">E-mail</label>
+          <input
+            className="cad-input"
+            type="email"
+            name="email"
+            placeholder="empresa@email.com"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
       </div>
 
       <div className="cad-divider" />
-
-      {/* Endereço */}
-      <div className="cad-field">
-        <label className="cad-label">CEP</label>
-        <input
-          className="cad-input"
-          name="cep"
-          placeholder="00000-000"
-          value={form.endereco.cep}
-          onChange={handleEndereco}
-          required
-        />
-      </div>
+      <span className="cad-section-label">Endereço</span>
 
       <div className="cad-row">
         <div className="cad-field">
-          <label className="cad-label">Logradouro</label>
+          <label className="cad-label">CEP</label>
           <input
             className="cad-input"
-            name="logradouro"
-            placeholder="Rua, Av..."
-            value={form.endereco.logradouro}
+            name="cep"
+            placeholder="00000-000"
+            value={form.endereco.cep}
             onChange={handleEndereco}
             required
           />
@@ -620,6 +647,17 @@ function FormEmpresa({ onSubmit }) {
 
       <div className="cad-row">
         <div className="cad-field">
+          <label className="cad-label">Logradouro</label>
+          <input
+            className="cad-input"
+            name="logradouro"
+            placeholder="Rua, Av..."
+            value={form.endereco.logradouro}
+            onChange={handleEndereco}
+            required
+          />
+        </div>
+        <div className="cad-field">
           <label className="cad-label">Bairro</label>
           <input
             className="cad-input"
@@ -630,6 +668,9 @@ function FormEmpresa({ onSubmit }) {
             required
           />
         </div>
+      </div>
+
+      <div className="cad-row">
         <div className="cad-field">
           <label className="cad-label">Cidade</label>
           <input
@@ -641,9 +682,6 @@ function FormEmpresa({ onSubmit }) {
             required
           />
         </div>
-      </div>
-
-      <div className="cad-row">
         <div className="cad-field">
           <label className="cad-label">Estado</label>
           <input
@@ -655,16 +693,17 @@ function FormEmpresa({ onSubmit }) {
             required
           />
         </div>
-        <div className="cad-field">
-          <label className="cad-label">Complemento</label>
-          <input
-            className="cad-input"
-            name="complemento"
-            placeholder="Apto, Bloco..."
-            value={form.endereco.complemento}
-            onChange={handleEndereco}
-          />
-        </div>
+      </div>
+
+      <div className="cad-field">
+        <label className="cad-label">Complemento</label>
+        <input
+          className="cad-input"
+          name="complemento"
+          placeholder="Apto, Bloco... (opcional)"
+          value={form.endereco.complemento}
+          onChange={handleEndereco}
+        />
       </div>
 
       <div className="cad-divider" />
@@ -675,32 +714,25 @@ function FormEmpresa({ onSubmit }) {
           className="cad-input"
           type="password"
           name="senha"
-          placeholder="********"
+          placeholder="••••••••"
           value={form.senha}
           onChange={handleChange}
           required
         />
       </div>
 
-      {erro && (
-        <p style={{ color: "#A32D2D", fontSize: 12, fontFamily: "Play, sans-serif", textAlign: "center" }}>
-          {erro}
-        </p>
-      )}
+      <button className="cad-btn" type="submit" disabled={loading}>
+        {loading ? "Cadastrando..." : "Cadastrar empresa"}
+      </button>
 
-      {sucesso && (
-        <p style={{ color: "#0F6E56", fontSize: 12, fontFamily: "Play, sans-serif", textAlign: "center" }}>
-          Empresa cadastrada com sucesso!
-        </p>
-      )}
-
-      <button className="cad-btn" type="submit" disabled={loading} onClick={handleSubmit}>
-  {loading ? "Cadastrando..." : "Cadastrar empresa"}
-</button>
+      <p className="cad-footer-text">
+        Já tem conta? <a href="/login">Entrar</a>
+      </p>
     </form>
   );
 }
 
+/* ─── EXPORT ─── */
 export default function CadastroCard({ onSubmit }) {
   const [aba, setAba] = useState("aluno");
 
@@ -710,7 +742,6 @@ export default function CadastroCard({ onSubmit }) {
 
       <div className="cad-wrapper">
         <div className="cad-card">
-
           <div className="cad-tabs">
             <button
               type="button"
@@ -719,7 +750,6 @@ export default function CadastroCard({ onSubmit }) {
             >
               Aluno
             </button>
-
             <button
               type="button"
               className={`cad-tab ${aba === "empresa" ? "active" : ""}`}
@@ -736,7 +766,6 @@ export default function CadastroCard({ onSubmit }) {
               <FormEmpresa onSubmit={onSubmit} />
             )}
           </div>
-
         </div>
       </div>
     </>

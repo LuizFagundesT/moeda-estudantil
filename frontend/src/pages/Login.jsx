@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import Spline from "@splinetool/react-spline";
 import LoginCard from "../components/LoginCard";
 import { alunoService } from "../services/alunoService";
+import { toast } from "../pages/Toast";
 
 const pageStyles = `
   .login-page {
@@ -32,6 +33,7 @@ const pageStyles = `
     align-items: center;
     justify-content: flex-end;
     padding: 0 180px;
+    box-sizing: border-box;
   }
 
   @media (max-width: 1024px) {
@@ -42,43 +44,26 @@ const pageStyles = `
   }
 
   @media (max-width: 768px) {
-    .login-page {
-      height: auto;
-      min-height: 100vh;
-    }
-    .login-content {
-      padding: 20px;
-    }
+    .login-page { height: auto; min-height: 100vh; }
+    .login-content { padding: 20px; align-items: flex-start; padding-top: 90px; }
   }
 `;
 
 export default function Login() {
   const navigate = useNavigate();
 
-    async function handleLogin(form) {
+  async function handleLogin(form) {
     try {
-      const { data } = await alunoService.login({
-        email: form.email,
-        senha: form.senha,
-      });
-
+      const { data } = await alunoService.login({ email: form.email, senha: form.senha });
       localStorage.setItem("usuarioLogado", JSON.stringify(data));
-
-      
       window.dispatchEvent(new Event("usuarioLogado"));
 
-      if (data.tipo === "ALUNO") {
-        navigate("/aluno/dashboard");
-      } else if (data.tipo === "PROFESSOR") {
-        navigate("/professor/dashboard");
-      } else if (data.tipo === "EMPRESA_PARCEIRA") {
-        navigate("/empresa/dashboard");
-      } else {
-        navigate("/");
-      }
-
+      if      (data.tipo === "ALUNO")           navigate("/aluno/dashboard");
+      else if (data.tipo === "PROFESSOR")        navigate("/professor/dashboard");
+      else if (data.tipo === "EMPRESA_PARCEIRA") navigate("/empresa/dashboard");
+      else                                       navigate("/");
     } catch (err) {
-      alert(err.response?.data?.message || "Email ou senha inválidos.");
+      toast.error(err.response?.data?.message || "E-mail ou senha inválidos.");
     }
   }
 
