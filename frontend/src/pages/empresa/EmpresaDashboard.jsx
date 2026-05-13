@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { empresaService } from "../../services/empresaService";
 import { vantagemService } from "../../services/vantagemService";
+import { resgateService } from "../../services/resgateService";
 import { toast } from "../shared/Toast";
 
 const emptyVantagem = {
@@ -385,6 +386,57 @@ const styles = `
     font-weight: 600;
   }
 
+
+  /* ── RESGATES ── */
+  .resgate-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .resgate-item {
+    background: rgba(255,255,255,.45);
+    border: 1px solid rgba(255,255,255,.62);
+    border-radius: 16px;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr auto;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .resgate-code {
+    font-weight: 800;
+    color: #534AB7;
+    letter-spacing: .6px;
+  }
+
+  .resgate-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(60,52,137,0.55);
+    margin-bottom: 4px;
+  }
+
+  .resgate-value {
+    color: #26215C;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .resgate-status {
+    border-radius: 999px;
+    padding: 8px 12px;
+    background: rgba(83,74,183,.10);
+    color: #534AB7;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+  }
+
   /* ── EMPTY STATE ── */
   .empty-state {
     border: 1px dashed rgba(83,74,183,.25);
@@ -420,6 +472,7 @@ const styles = `
     .empresa-page { padding: 90px 16px 40px; }
     .empresa-stats { grid-template-columns: 1fr 1fr; }
     .vantagens-grid { grid-auto-columns: minmax(240px, 85vw); }
+    .resgate-item { grid-template-columns: 1fr; }
   }
 `;
 
@@ -437,6 +490,7 @@ export default function EmpresaDashboard() {
 
   const [empresa, setEmpresa] = useState(null);
   const [vantagens, setVantagens] = useState([]);
+  const [resgates, setResgates] = useState([]);
   const [formVantagem, setFormVantagem] = useState(emptyVantagem);
   const [editandoVantagemId, setEditandoVantagemId] = useState(null);
   const [formPerfil, setFormPerfil] = useState({});
@@ -467,8 +521,12 @@ export default function EmpresaDashboard() {
       setEmpresa(minhaEmpresa);
       prepararFormPerfil(minhaEmpresa);
 
-      const vantagensRes = await vantagemService.listarPorEmpresa(minhaEmpresa.id);
+      const [vantagensRes, resgatesRes] = await Promise.all([
+        vantagemService.listarPorEmpresa(minhaEmpresa.id),
+        resgateService.listarPorEmpresa(minhaEmpresa.id),
+      ]);
       setVantagens(vantagensRes.data);
+      setResgates(resgatesRes.data);
     } catch {
       toast.error("Erro ao carregar dados da empresa.");
     } finally {
@@ -651,7 +709,7 @@ export default function EmpresaDashboard() {
           </div>
           <div className="empresa-stat">
             <span className="empresa-stat-label">Resgates</span>
-            <strong className="empresa-stat-value">0</strong>
+            <strong className="empresa-stat-value">{resgates.length}</strong>
           </div>
         </section>
 
@@ -769,12 +827,39 @@ export default function EmpresaDashboard() {
           <div className="empresa-card-head">
             <div>
               <h3 className="empresa-card-title">Histórico de resgates</h3>
-              <p className="empresa-card-desc">Resgates realizados pelos alunos aparecerão aqui.</p>
+              <p className="empresa-card-desc">Resgates realizados pelos alunos com código de conferência.</p>
             </div>
           </div>
-          <div className="empty-state">
-            Nenhum resgate registrado. Quando o módulo de resgate for integrado, os registros aparecerão aqui.
-          </div>
+
+          {resgates.length === 0 ? (
+            <div className="empty-state">
+              Nenhum resgate registrado ainda. Quando um aluno resgatar uma vantagem desta empresa, o registro aparecerá aqui.
+            </div>
+          ) : (
+            <div className="resgate-list">
+              {resgates.map((r) => (
+                <article className="resgate-item" key={r.id}>
+                  <div>
+                    <span className="resgate-label">Código do cupom</span>
+                    <span className="resgate-code">{r.codigoCupom}</span>
+                  </div>
+                  <div>
+                    <span className="resgate-label">Aluno</span>
+                    <span className="resgate-value">{r.alunoNome}<br />{r.alunoEmail}</span>
+                  </div>
+                  <div>
+                    <span className="resgate-label">Vantagem</span>
+                    <span className="resgate-value">{r.vantagemTitulo}<br />{r.custoMoedas} KRN</span>
+                  </div>
+                  <div>
+                    <span className="resgate-label">Data</span>
+                    <span className="resgate-value">{r.dataResgate ? new Date(r.dataResgate).toLocaleString("pt-BR") : "—"}</span>
+                    <div className="resgate-status">{r.status}</div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Perfil */}

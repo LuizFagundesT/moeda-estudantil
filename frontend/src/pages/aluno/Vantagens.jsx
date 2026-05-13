@@ -1,26 +1,76 @@
 import { useEffect, useState } from "react";
 import { vantagemService } from "../../services/vantagemService";
+import { resgateService } from "../../services/resgateService";
+import { alunoService } from "../../services/alunoService";
+import { toast } from "../shared/Toast";
 
 export default function Vantagens() {
 
     const [vantagens, setVantagens] = useState([]);
+    const [aluno, setAluno] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [resgatandoId, setResgatandoId] = useState(null);
+    const [cupom, setCupom] = useState(null);
 
     useEffect(() => {
-        carregarVantagens();
+        carregarDados();
     }, []);
 
-    async function carregarVantagens() {
+    async function carregarDados() {
         try {
+            setLoading(true);
+            const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
 
-            const response = await vantagemService.listarAtivas();
+            const [vantagensRes, alunosRes] = await Promise.all([
+                vantagemService.listarAtivas(),
+                alunoService.listar(),
+            ]);
 
-            setVantagens(response.data);
+            setVantagens(vantagensRes.data);
 
+            const meuAluno = usuarioLogado?.id
+                ? alunosRes.data.find((a) => a.id === usuarioLogado.id) || alunosRes.data.find((a) => a.email === usuarioLogado?.email)
+                : alunosRes.data.find((a) => a.email === usuarioLogado?.email);
+
+            setAluno(meuAluno || null);
         } catch (error) {
             console.error("Erro ao carregar vantagens", error);
+            toast.error("Erro ao carregar vantagens.");
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function resgatarVantagem(vantagem) {
+        if (!aluno?.id) {
+            toast.error("Aluno logado não encontrado.");
+            return;
+        }
+
+        if (vantagem.quantidadeDisponivel !== null && vantagem.quantidadeDisponivel !== undefined && vantagem.quantidadeDisponivel <= 0) {
+            toast.error("Esta vantagem está esgotada.");
+            return;
+        }
+
+        const saldoAtual = Number(aluno.saldoMoedas || 0);
+        if (saldoAtual < Number(vantagem.custoMoedas || 0)) {
+            toast.error("Saldo insuficiente para resgatar esta vantagem.");
+            return;
+        }
+
+        const confirmou = window.confirm(`Deseja resgatar "${vantagem.titulo}" por ${vantagem.custoMoedas} KRNs?`);
+        if (!confirmou) return;
+
+        try {
+            setResgatandoId(vantagem.id);
+            const { data } = await resgateService.resgatar(aluno.id, vantagem.id);
+            setCupom(data);
+            toast.success(`Resgate realizado! Código: ${data.codigoCupom}`);
+            await carregarDados();
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.response?.data || "Erro ao resgatar vantagem.");
+        } finally {
+            setResgatandoId(null);
         }
     }
 
@@ -28,14 +78,15 @@ export default function Vantagens() {
     .vantagens-page {
       min-height: 100vh;
       background: linear-gradient(135deg, #eef3ff 0%, #dfe8ff 100%);
-      padding: 40px;
+      padding: 100px 40px 60px;
       font-family: 'Play', sans-serif;
       color: #26215C;
+      box-sizing: border-box;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 50px;
+      margin-bottom: 36px;
     }
 
     .hero h1 {
@@ -47,6 +98,36 @@ export default function Vantagens() {
     .hero p {
       color: #6666a3;
       font-size: 18px;
+    }
+
+    .saldo-box, .cupom-box {
+      max-width: 860px;
+      margin: 0 auto 28px;
+      background: rgba(255,255,255,.52);
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: 22px;
+      padding: 20px 24px;
+      box-shadow: 0 8px 24px rgba(83,74,183,.08);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .saldo-box strong, .cupom-code {
+      color: #534AB7;
+      font-size: 24px;
+    }
+
+    .cupom-box {
+      border-color: rgba(34,197,94,.25);
+      background: rgba(240,253,244,.72);
+    }
+
+    .cupom-info {
+      line-height: 1.6;
+      color: rgba(38,33,92,.75);
     }
 
     .vantagens-grid {
@@ -63,6 +144,8 @@ export default function Vantagens() {
       box-shadow: 0 10px 24px rgba(83,74,183,.08);
       transition: .3s ease;
       border: 1px solid rgba(255,255,255,.4);
+      display: flex;
+      flex-direction: column;
     }
 
     .vantagem-card:hover {
@@ -77,6 +160,9 @@ export default function Vantagens() {
 
     .vantagem-content {
       padding: 24px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     .vantagem-titulo {
@@ -91,11 +177,12 @@ export default function Vantagens() {
       line-height: 1.5;
       margin-bottom: 20px;
       min-height: 60px;
+      flex: 1;
     }
 
-    .empresa {
+    .empresa, .estoque {
       font-size: 14px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
       color: #8a86c9;
     }
 
@@ -103,6 +190,8 @@ export default function Vantagens() {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
+      margin-top: 10px;
     }
 
     .custo {
@@ -122,18 +211,17 @@ export default function Vantagens() {
       transition: .3s;
     }
 
-    .resgatar-btn:hover {
+    .resgatar-btn:hover:not(:disabled) {
       transform: scale(1.05);
     }
 
-    .empty {
-      text-align: center;
-      padding: 80px;
-      color: #777;
-      font-size: 20px;
+    .resgatar-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
     }
 
-    .loading {
+    .empty, .loading {
       text-align: center;
       padding: 80px;
       color: #534AB7;
@@ -141,15 +229,9 @@ export default function Vantagens() {
     }
 
     @media (max-width: 768px) {
-
-      .vantagens-page {
-        padding: 20px;
-      }
-
-      .hero h1 {
-        font-size: 36px;
-      }
-
+      .vantagens-page { padding: 90px 20px 40px; }
+      .hero h1 { font-size: 36px; }
+      .footer-card { align-items: flex-start; flex-direction: column; }
     }
   `;
 
@@ -157,10 +239,7 @@ export default function Vantagens() {
         return (
             <>
                 <style>{styles}</style>
-
-                <div className="loading">
-                    Carregando vantagens...
-                </div>
+                <div className="loading">Carregando vantagens...</div>
             </>
         );
     }
@@ -172,75 +251,64 @@ export default function Vantagens() {
             <div className="vantagens-page">
 
                 <section className="hero">
-
                     <h1>Vantagens disponíveis</h1>
-
-                    <p>
-                        Troque seus KRNs por benefícios exclusivos oferecidos
-                        pelas empresas parceiras.
-                    </p>
-
+                    <p>Troque seus KRNs por benefícios exclusivos oferecidos pelas empresas parceiras.</p>
                 </section>
 
-                {vantagens.length === 0 ? (
+                <div className="saldo-box">
+                    <span>Saldo disponível para troca</span>
+                    <strong>{Number(aluno?.saldoMoedas || 0)} KRNs</strong>
+                </div>
 
-                    <div className="empty">
-                        Nenhuma vantagem disponível no momento.
+                {cupom && (
+                    <div className="cupom-box">
+                        <div className="cupom-info">
+                            <strong>Resgate realizado!</strong><br />
+                            Apresente este código na empresa parceira para conferir a troca.
+                        </div>
+                        <div className="cupom-code">{cupom.codigoCupom}</div>
                     </div>
-
-                ) : (
-
-                    <div className="vantagens-grid">
-
-                        {vantagens.map((vantagem) => (
-
-                            <div className="vantagem-card" key={vantagem.id}>
-
-                                <img
-                                    src={
-                                        vantagem.fotoUrl ||
-                                        "https://placehold.co/600x400?text=KRN"
-                                    }
-                                    alt={vantagem.titulo}
-                                    className="vantagem-img"
-                                />
-
-                                <div className="vantagem-content">
-
-                                    <div className="vantagem-titulo">
-                                        {vantagem.titulo}
-                                    </div>
-
-                                    <div className="vantagem-descricao">
-                                        {vantagem.descricao}
-                                    </div>
-
-                                    <div className="empresa">
-                                        Parceiro: {vantagem.empresaNomeFantasia}
-                                    </div>
-
-                                    <div className="footer-card">
-
-                                        <div className="custo">
-                                            💰 {vantagem.custoMoedas} KRNs
-                                        </div>
-
-                                        <button className="resgatar-btn">
-                                            Resgatar
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        ))}
-
-                    </div>
-
                 )}
 
+                {vantagens.length === 0 ? (
+                    <div className="empty">Nenhuma vantagem disponível no momento.</div>
+                ) : (
+                    <div className="vantagens-grid">
+                        {vantagens.map((vantagem) => {
+                            const esgotada = vantagem.quantidadeDisponivel !== null && vantagem.quantidadeDisponivel !== undefined && vantagem.quantidadeDisponivel <= 0;
+                            const saldoInsuficiente = Number(aluno?.saldoMoedas || 0) < Number(vantagem.custoMoedas || 0);
+
+                            return (
+                                <div className="vantagem-card" key={vantagem.id}>
+                                    <img
+                                        src={vantagem.fotoUrl || "https://placehold.co/600x400?text=KRN"}
+                                        alt={vantagem.titulo}
+                                        className="vantagem-img"
+                                    />
+
+                                    <div className="vantagem-content">
+                                        <div className="vantagem-titulo">{vantagem.titulo}</div>
+                                        <div className="vantagem-descricao">{vantagem.descricao}</div>
+                                        <div className="empresa">Parceiro: {vantagem.empresaNomeFantasia}</div>
+                                        <div className="estoque">Disponível: {vantagem.quantidadeDisponivel ?? "Ilimitado"}</div>
+
+                                        <div className="footer-card">
+                                            <div className="custo">💰 {vantagem.custoMoedas} KRNs</div>
+                                            <button
+                                                className="resgatar-btn"
+                                                disabled={resgatandoId === vantagem.id || esgotada || saldoInsuficiente}
+                                                onClick={() => resgatarVantagem(vantagem)}
+                                                title={esgotada ? "Vantagem esgotada" : saldoInsuficiente ? "Saldo insuficiente" : "Resgatar vantagem"}
+                                            >
+                                                {resgatandoId === vantagem.id ? "Resgatando..." : esgotada ? "Esgotada" : saldoInsuficiente ? "Saldo insuficiente" : "Resgatar"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </>
     );
