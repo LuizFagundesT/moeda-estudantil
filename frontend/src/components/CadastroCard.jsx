@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { toast } from "../pages/Toast";
+import { toast } from "../pages/shared/Toast";
 
 const styles = `
   .cad-wrapper {

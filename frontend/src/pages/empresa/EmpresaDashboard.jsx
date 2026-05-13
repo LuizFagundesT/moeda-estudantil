@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { empresaService } from "../services/empresaService";
-import { vantagemService } from "../services/vantagemService";
-import { toast } from "./Toast";
+import { empresaService } from "../../services/empresaService";
+import { vantagemService } from "../../services/vantagemService";
+import { toast } from "../shared/Toast";
 
 const emptyVantagem = {
   titulo: "",
@@ -424,28 +424,28 @@ const styles = `
 `;
 
 const NAV_ITEMS = [
-  { label: "Dashboard",           id: "topo"           },
-  { label: "Criar vantagem",      id: "form-vantagem"  },
-  { label: "Vantagens",           id: "lista-vantagens"},
-  { label: "Resgates",            id: "historico"      },
-  { label: "Perfil",              id: "perfil"         },
+  { label: "Dashboard", id: "topo" },
+  { label: "Criar vantagem", id: "form-vantagem" },
+  { label: "Vantagens", id: "lista-vantagens" },
+  { label: "Resgates", id: "historico" },
+  { label: "Perfil", id: "perfil" },
 ];
 
 export default function EmpresaDashboard() {
   const navigate = useNavigate();
   const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
 
-  const [empresa,            setEmpresa]            = useState(null);
-  const [vantagens,          setVantagens]          = useState([]);
-  const [formVantagem,       setFormVantagem]       = useState(emptyVantagem);
+  const [empresa, setEmpresa] = useState(null);
+  const [vantagens, setVantagens] = useState([]);
+  const [formVantagem, setFormVantagem] = useState(emptyVantagem);
   const [editandoVantagemId, setEditandoVantagemId] = useState(null);
-  const [formPerfil,         setFormPerfil]         = useState({});
-  const [editandoPerfil,     setEditandoPerfil]     = useState(false);
-  const [loading,            setLoading]            = useState(true);
-  const [navAtivo,           setNavAtivo]           = useState("topo");
+  const [formPerfil, setFormPerfil] = useState({});
+  const [editandoPerfil, setEditandoPerfil] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [navAtivo, setNavAtivo] = useState("topo");
 
-  const totalAtivas  = useMemo(() => vantagens.filter((v) => v.ativa).length, [vantagens]);
-  const custoMedio   = useMemo(() => {
+  const totalAtivas = useMemo(() => vantagens.filter((v) => v.ativa).length, [vantagens]);
+  const custoMedio = useMemo(() => {
     if (!vantagens.length) return 0;
     const soma = vantagens.reduce((acc, v) => acc + Number(v.custoMoedas || 0), 0);
     return Math.round(soma / vantagens.length);
@@ -485,13 +485,13 @@ export default function EmpresaDashboard() {
       nomeFantasia: e.nomeFantasia || "",
       endereco: {
         logradouro: e.endereco?.logradouro || "",
-        numero:     e.endereco?.numero     || "",
-        complemento:e.endereco?.complemento|| "",
-        bairro:     e.endereco?.bairro     || "",
-        cidade:     e.endereco?.cidade     || "",
-        estado:     e.endereco?.estado     || "",
-        cep:        e.endereco?.cep        || "",
-        pais:       e.endereco?.pais       || "",
+        numero: e.endereco?.numero || "",
+        complemento: e.endereco?.complemento || "",
+        bairro: e.endereco?.bairro || "",
+        cidade: e.endereco?.cidade || "",
+        estado: e.endereco?.estado || "",
+        cep: e.endereco?.cep || "",
+        pais: e.endereco?.pais || "",
       },
     });
   }
@@ -508,18 +508,18 @@ export default function EmpresaDashboard() {
 
   function montarPayload() {
     return {
-      titulo:               formVantagem.titulo.trim(),
-      descricao:            formVantagem.descricao.trim(),
-      custoMoedas:          Number(formVantagem.custoMoedas),
-      fotoUrl:              formVantagem.fotoUrl.trim(),
+      titulo: formVantagem.titulo.trim(),
+      descricao: formVantagem.descricao.trim(),
+      custoMoedas: Number(formVantagem.custoMoedas),
+      fotoUrl: formVantagem.fotoUrl.trim(),
       quantidadeDisponivel: formVantagem.quantidadeDisponivel === "" ? null : Number(formVantagem.quantidadeDisponivel),
-      ativa:                Boolean(formVantagem.ativa),
+      ativa: Boolean(formVantagem.ativa),
     };
   }
 
   function validarVantagem() {
-    if (!formVantagem.titulo.trim())                                      return "Informe o título da vantagem.";
-    if (!formVantagem.descricao.trim())                                   return "Informe a descrição.";
+    if (!formVantagem.titulo.trim()) return "Informe o título da vantagem.";
+    if (!formVantagem.descricao.trim()) return "Informe a descrição.";
     if (!formVantagem.custoMoedas || Number(formVantagem.custoMoedas) <= 0) return "Custo em moedas deve ser maior que zero.";
     return null;
   }
@@ -549,12 +549,12 @@ export default function EmpresaDashboard() {
   function editarVantagem(v) {
     setEditandoVantagemId(v.id);
     setFormVantagem({
-      titulo:               v.titulo               || "",
-      descricao:            v.descricao            || "",
-      custoMoedas:          v.custoMoedas          || "",
-      fotoUrl:              v.fotoUrl              || "",
+      titulo: v.titulo || "",
+      descricao: v.descricao || "",
+      custoMoedas: v.custoMoedas || "",
+      fotoUrl: v.fotoUrl || "",
       quantidadeDisponivel: v.quantidadeDisponivel ?? "",
-      ativa:                v.ativa                ?? true,
+      ativa: v.ativa ?? true,
     });
     scrollTo("form-vantagem");
   }
@@ -792,14 +792,14 @@ export default function EmpresaDashboard() {
           {!editandoPerfil ? (
             <div className="empresa-info-grid">
               {[
-                ["Responsável",    empresa?.nome],
-                ["Nome fantasia",  empresa?.nomeFantasia],
-                ["Email",          empresa?.email],
-                ["CNPJ",           empresa?.cnpj],
-                ["CPF",            empresa?.cpf],
-                ["Cidade / Estado",`${empresa?.endereco?.cidade || "—"} / ${empresa?.endereco?.estado || "—"}`],
-                ["Endereço",       `${empresa?.endereco?.logradouro || "—"}, ${empresa?.endereco?.numero || "—"}`],
-                ["CEP",            empresa?.endereco?.cep],
+                ["Responsável", empresa?.nome],
+                ["Nome fantasia", empresa?.nomeFantasia],
+                ["Email", empresa?.email],
+                ["CNPJ", empresa?.cnpj],
+                ["CPF", empresa?.cpf],
+                ["Cidade / Estado", `${empresa?.endereco?.cidade || "—"} / ${empresa?.endereco?.estado || "—"}`],
+                ["Endereço", `${empresa?.endereco?.logradouro || "—"}, ${empresa?.endereco?.numero || "—"}`],
+                ["CEP", empresa?.endereco?.cep],
               ].map(([label, val]) => (
                 <div className="empresa-info-item" key={label}>
                   <label>{label}</label>
@@ -812,10 +812,10 @@ export default function EmpresaDashboard() {
               <div className="empresa-form-grid">
                 {[
                   ["Nome responsável", "nome"],
-                  ["Nome fantasia",    "nomeFantasia"],
-                  ["Email",            "email"],
-                  ["CPF",              "cpf"],
-                  ["CNPJ",             "cnpj"],
+                  ["Nome fantasia", "nomeFantasia"],
+                  ["Email", "email"],
+                  ["CPF", "cpf"],
+                  ["CNPJ", "cnpj"],
                 ].map(([label, campo]) => (
                   <div className="empresa-field" key={campo}>
                     <label className="empresa-label">{label}</label>
@@ -825,14 +825,14 @@ export default function EmpresaDashboard() {
                 ))}
 
                 {[
-                  ["Logradouro",  "logradouro"],
-                  ["Número",      "numero"],
+                  ["Logradouro", "logradouro"],
+                  ["Número", "numero"],
                   ["Complemento", "complemento"],
-                  ["Bairro",      "bairro"],
-                  ["Cidade",      "cidade"],
-                  ["Estado",      "estado"],
-                  ["CEP",         "cep"],
-                  ["País",        "pais"],
+                  ["Bairro", "bairro"],
+                  ["Cidade", "cidade"],
+                  ["Estado", "estado"],
+                  ["CEP", "cep"],
+                  ["País", "pais"],
                 ].map(([label, campo]) => (
                   <div className="empresa-field" key={campo}>
                     <label className="empresa-label">{label}</label>

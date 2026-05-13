@@ -272,18 +272,18 @@ const headerStyles = `
 `;
 
 const NAV_LINKS = [
-  { label: "Home",          route: "/"              },
+  { label: "Home", route: "/" },
   { label: "Como funciona", route: "/como-funciona" },
-  { label: "Vantagens",     route: "/vantagens"     },
-  { label: "Parceiros",     route: "/parceiros"     },
-  { label: "Ranking",       route: "/ranking"       },
+  { label: "Vantagens", route: "/vantagens" },
+  { label: "Parceiros", route: "/parceiros" },
+  { label: "Ranking", route: "/ranking" },
 ];
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
-  const [usuario,  setUsuario]  = useState(null);
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const [usuario, setUsuario] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -309,7 +309,7 @@ export default function Header() {
   }
 
   const primeiroNome = usuario?.nome?.split(" ")[0] ?? "";
-  const inicial      = primeiroNome.charAt(0).toUpperCase();
+  const inicial = primeiroNome.charAt(0).toUpperCase();
 
   return (
     <>
@@ -350,8 +350,8 @@ export default function Header() {
             </>
           ) : (
             <>
-              <button className="kn-btn-ghost"   onClick={() => navigate("/login")}>Entrar</button>
-              <button className="kn-btn-primary"  onClick={() => navigate("/cadastro")}>Criar conta</button>
+              <button className="kn-btn-ghost" onClick={() => navigate("/login")}>Entrar</button>
+              <button className="kn-btn-primary" onClick={() => navigate("/cadastro")}>Criar conta</button>
             </>
           )}
         </div>

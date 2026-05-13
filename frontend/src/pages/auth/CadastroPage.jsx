@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import Spline from "@splinetool/react-spline";
-import CadastroCard from "../components/CadastroCard";
-import { alunoService } from "../services/alunoService";
-import { toast } from "./Toast";
+import CadastroCard from "../../components/CadastroCard";
+import { alunoService } from "../../services/alunoService";
+import { toast } from "../shared/Toast";
 
 const pageStyles = `
   .cadastro-page {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { alunoService } from "../services/alunoService";
-import { toast } from "./Toast";
+import { alunoService } from "../../services/alunoService";
+import { toast } from "../shared/Toast";
 
 const styles = `
   .aluno-page {
@@ -341,8 +341,8 @@ const styles = `
 export default function AlunoDashboard() {
   const navigate = useNavigate();
 
-  const [aluno, setAluno]       = useState(null);
-  const [extrato, setExtrato]   = useState([]);
+  const [aluno, setAluno] = useState(null);
+  const [extrato, setExtrato] = useState([]);
   const [editando, setEditando] = useState(false);
   const [formEdit, setFormEdit] = useState({});
 
