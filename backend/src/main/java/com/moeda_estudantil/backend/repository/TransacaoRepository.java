@@ -7,5 +7,9 @@ import java.util.List;
 
 public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
 
+    // Extrato do aluno (já existia)
     List<Transacao> findByAlunoIdOrderByDataDesc(Long alunoId);
+
+    // Extrato do professor: todos os envios que ele fez
+    List<Transacao> findByProfessorIdOrderByDataDesc(Long professorId);
 }

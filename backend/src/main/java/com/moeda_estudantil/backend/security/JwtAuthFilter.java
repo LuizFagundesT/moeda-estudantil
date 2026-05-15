@@ -20,6 +20,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UsuarioRepository usuarioRepository;
 
+    // Rotas que passam direto sem precisar de token
+    private static final List<String> PUBLIC_PATHS = List.of(
+            "/auth",
+            "/swagger-ui",
+            "/v3/api-docs",
+            "/empresas",
+            "/professores",
+            "/alunos"
+    );
+
     public JwtAuthFilter(JwtService jwtService,
                          UsuarioRepository usuarioRepository) {
         this.jwtService = jwtService;
@@ -34,17 +44,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        //  LIBERA ROTAS PÚBLICAS (ESSENCIAL)
-        if (path.startsWith("/auth")
-                || path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs")) {
+        // Libera todas as rotas públicas
+        boolean isPublic = PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+        if (isPublic) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String authHeader = request.getHeader("Authorization");
 
-        // sem token → segue fluxo normal (SecurityConfig decide)
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -56,18 +64,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String email = jwtService.extractUsername(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
                 usuarioRepository.findByEmail(email).ifPresent(usuario -> {
-
                     String role = "ROLE_" + usuario.getTipo().name();
-
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(
                                     email,
                                     null,
                                     List.of(new SimpleGrantedAuthority(role))
                             );
-
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 });
             }

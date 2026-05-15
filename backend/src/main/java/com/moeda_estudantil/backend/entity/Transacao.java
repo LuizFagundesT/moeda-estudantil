@@ -26,4 +26,9 @@ public class Transacao {
     @ManyToOne
     @JoinColumn(name = "aluno_id")
     private Aluno aluno;
+
+    // Professor que originou o envio (null para transações de resgate)
+    @ManyToOne
+    @JoinColumn(name = "professor_id")
+    private Professor professor;
 }

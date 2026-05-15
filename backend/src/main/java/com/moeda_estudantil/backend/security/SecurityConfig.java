@@ -36,10 +36,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*")); // libera tudo em dev
+        config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(false); // ou true só se o frontend mandar credentials
+        config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -55,18 +55,26 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        // rotas públicas existentes
+                        // Rotas públicas
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // ✅ CRUD completo de empresas liberado
+                        //  Empresas
                         .requestMatchers("/empresas/**").permitAll()
                         .requestMatchers("/empresas").permitAll()
 
-                        // resto protegido
+                        //  Professores (liberado para testes no Postman)
+                        .requestMatchers("/professores/**").permitAll()
+                        .requestMatchers("/professores").permitAll()
+
+                        //  Alunos (liberado para testes no Postman)
+                        .requestMatchers("/alunos/**").permitAll()
+                        .requestMatchers("/alunos").permitAll()
+
+                        // Resto protegido
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

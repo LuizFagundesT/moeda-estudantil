@@ -10,4 +10,7 @@ import lombok.Data;
 public class Professor extends Usuario {
 
     private String departamento;
+    private String universidade;
+    @Column(nullable=false)
+    private Double saldoMoedas = 0.0;
 }
