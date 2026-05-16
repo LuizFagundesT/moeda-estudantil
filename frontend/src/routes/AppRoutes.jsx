@@ -10,6 +10,7 @@ import EmpresaDashboard from "../pages/empresa/EmpresaDashboard";
 import ComoFunciona from "../pages/public/ComoFunciona";
 import Vantagens from "../pages/aluno/Vantagens";
 import Parceiros from "../pages/aluno/Parceiros";
+import ProfessorDashboard from "../pages/professor/ProfessorDashboard";
 
 export default function AppRoutes() {
   return (
@@ -46,6 +47,12 @@ export default function AppRoutes() {
         <Route path="/empresa/dashboard" element={
           <ProtectedRoute tipoPermitido="EMPRESA_PARCEIRA">
             <EmpresaDashboard />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/professor/dashboard" element={
+          <ProtectedRoute tipoPermitido="PROFESSOR">
+            <ProfessorDashboard />
           </ProtectedRoute>
         } />
 
