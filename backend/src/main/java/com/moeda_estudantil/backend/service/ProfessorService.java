@@ -20,9 +20,7 @@ public class ProfessorService {
     private final ProfessorRepository professorRepository;
     private final AlunoRepository alunoRepository;
     private final TransacaoService transacaoService;
-    // private final EmailService emailService;
 
-    // ─── Listar todos ────────────────────────────────────────────────────────
     public List<ProfessorDTO> listarTodos() {
         return professorRepository.findAll()
                 .stream()
@@ -30,12 +28,10 @@ public class ProfessorService {
                 .collect(Collectors.toList());
     }
 
-    // ─── Buscar por ID ───────────────────────────────────────────────────────
     public ProfessorDTO buscarPorId(Long id) {
         return toDTO(buscarEntidadePorId(id));
     }
 
-    // ─── Atualizar dados do professor ────────────────────────────────────────
     @Transactional
     public ProfessorDTO atualizar(Long id, ProfessorUpdateRequestDTO dto) {
         Professor professor = buscarEntidadePorId(id);
@@ -58,7 +54,6 @@ public class ProfessorService {
         return toDTO(professorRepository.save(professor));
     }
 
-    // ─── Deletar professor ───────────────────────────────────────────────────
     @Transactional
     public void deletar(Long id) {
         if (!professorRepository.existsById(id)) {
@@ -67,7 +62,6 @@ public class ProfessorService {
         professorRepository.deleteById(id);
     }
 
-    // ─── Enviar moedas para aluno ────────────────────────────────────────────
     @Transactional
     public void enviarMoedas(Long professorId, EnviarMoedasRequestDTO dto) {
         Professor professor = buscarEntidadePorId(professorId);
@@ -80,33 +74,18 @@ public class ProfessorService {
                     "Saldo insuficiente. Saldo atual: " + professor.getSaldoMoedas() + " moedas.");
         }
 
-        // Debita do professor
+        //  Apenas debita do professor aqui
         professor.setSaldoMoedas(professor.getSaldoMoedas() - dto.getQuantidade());
         professorRepository.save(professor);
 
-        // Credita no aluno e salva
-        aluno.setSaldoMoedas(aluno.getSaldoMoedas() + dto.getQuantidade());
-        alunoRepository.save(aluno);
-
-        // Registra as duas transações
+        //  O crédito no aluno e o registro das transações ficam só no TransacaoService
         transacaoService.registrarEnvio(professor, aluno, dto.getQuantidade(), dto.getMotivo());
-
-        // // Notifica o aluno por email
-        // emailService.enviarEmailRecebimentoMoedas(
-        //         aluno.getEmail(),
-        //         aluno.getNome(),
-        //         professor.getNome(),
-        //         dto.getQuantidade(),
-        //         dto.getMotivo()
-        // );
     }
 
-    // ─── Saldo atual do professor ─────────────────────────────────────────────
     public Double saldo(Long professorId) {
         return buscarEntidadePorId(professorId).getSaldoMoedas();
     }
 
-    // ─── Extrato do professor ─────────────────────────────────────────────────
     public List<TransacaoResponse> extrato(Long professorId) {
         buscarEntidadePorId(professorId);
         return transacaoService.listarExtratoProfessor(professorId)
@@ -115,7 +94,6 @@ public class ProfessorService {
                 .collect(Collectors.toList());
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────────────────
     private Professor buscarEntidadePorId(Long id) {
         return professorRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(

@@ -18,6 +18,25 @@ services:
       timeout: 5s
       retries: 5
 
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"    # porta que o Spring usa
+      - "15672:15672"  # painel visual → http://localhost:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: ./backend
     container_name: spring_backend
@@ -31,6 +50,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      rabbitmq:               # backend espera o RabbitMQ estar saudável
+        condition: service_healthy
 
   frontend:
     build: ./frontend
@@ -43,3 +64,4 @@ services:
 
 volumes:
   postgres_data:
+  rabbitmq_data:  

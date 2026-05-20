@@ -77,7 +77,7 @@ public class DataSeeder implements CommandLineRunner {
             Professor prof1 = new Professor();
             prof1.setNome("João Silva");
             prof1.setEmail("joao.silva@pucminas.br");
-            prof1.setSenha(passwordEncoder.encode("http://localhost:8080/professores/1/extrato")); // use seu PasswordEncoder
+            prof1.setSenha(passwordEncoder.encode("40028922")); // use seu PasswordEncoder
             prof1.setCpf("111.222.333-44");
             prof1.setDepartamento("Engenharia de Software");
             prof1.setUniversidade("PUC Minas");
