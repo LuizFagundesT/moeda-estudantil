@@ -1,3 +1,5 @@
+// 🔍 Code Review por Caio Lima — ver comentários no Pull Request
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { alunoService } from "../../services/alunoService";
