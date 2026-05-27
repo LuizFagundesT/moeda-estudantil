@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "../pages/shared/Toast";
+import { cepService, formatarCep } from "../services/cepService";
 
 const styles = `
   .cad-wrapper {
@@ -179,6 +180,12 @@ const styles = `
     margin: 2px 0 -4px;
   }
 
+  .cad-help {
+    margin-top: 6px;
+    font-size: 11px;
+    color: rgba(83,74,183,.58);
+  }
+
   /* ── BUTTON ── */
   .cad-btn {
     border: none;
@@ -262,16 +269,49 @@ function FormAluno({ onSubmit }) {
       pais: "Brasil",
     },
   });
+  const [buscandoCep, setBuscandoCep] = useState(false);
+  const [ultimoCepBuscado, setUltimoCepBuscado] = useState("");
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  async function buscarCep(cep) {
+    const cepLimpo = String(cep || "").replace(/\D/g, "");
+    if (cepLimpo.length !== 8 || cepLimpo === ultimoCepBuscado) return;
+
+    try {
+      setBuscandoCep(true);
+      const endereco = await cepService.buscarPorCep(cepLimpo);
+      setUltimoCepBuscado(cepLimpo);
+      setForm((atual) => ({
+        ...atual,
+        endereco: {
+          ...atual.endereco,
+          ...endereco,
+          numero: atual.endereco.numero,
+          complemento: atual.endereco.complemento || endereco.complemento,
+        },
+      }));
+    } catch (err) {
+      setUltimoCepBuscado("");
+      toast.error(err.message || "Nao foi possivel buscar o CEP.");
+    } finally {
+      setBuscandoCep(false);
+    }
+  }
+
   function handleEndereco(e) {
+    const { name } = e.target;
+    const value = name === "cep" ? formatarCep(e.target.value) : e.target.value;
     setForm({
       ...form,
-      endereco: { ...form.endereco, [e.target.name]: e.target.value },
+      endereco: { ...form.endereco, [name]: value },
     });
+
+    if (name === "cep") {
+      buscarCep(value);
+    }
   }
 
   function handleSubmit(e) {
@@ -381,11 +421,12 @@ function FormAluno({ onSubmit }) {
           <input
             className="cad-input"
             name="cep"
-            placeholder="00000-000"
+            placeholder={buscandoCep ? "Buscando CEP..." : "00000-000"}
             value={form.endereco.cep}
             onChange={handleEndereco}
             required
           />
+          {buscandoCep && <div className="cad-help">Buscando endereco...</div>}
         </div>
         <div className="cad-field">
           <label className="cad-label">Número</label>
@@ -509,16 +550,49 @@ function FormEmpresa({ onSubmit }) {
   });
 
   const [loading, setLoading] = useState(false);
+  const [buscandoCep, setBuscandoCep] = useState(false);
+  const [ultimoCepBuscado, setUltimoCepBuscado] = useState("");
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  async function buscarCep(cep) {
+    const cepLimpo = String(cep || "").replace(/\D/g, "");
+    if (cepLimpo.length !== 8 || cepLimpo === ultimoCepBuscado) return;
+
+    try {
+      setBuscandoCep(true);
+      const endereco = await cepService.buscarPorCep(cepLimpo);
+      setUltimoCepBuscado(cepLimpo);
+      setForm((atual) => ({
+        ...atual,
+        endereco: {
+          ...atual.endereco,
+          ...endereco,
+          numero: atual.endereco.numero,
+          complemento: atual.endereco.complemento || endereco.complemento,
+        },
+      }));
+    } catch (err) {
+      setUltimoCepBuscado("");
+      toast.error(err.message || "Nao foi possivel buscar o CEP.");
+    } finally {
+      setBuscandoCep(false);
+    }
+  }
+
   function handleEndereco(e) {
+    const { name } = e.target;
+    const value = name === "cep" ? formatarCep(e.target.value) : e.target.value;
     setForm({
       ...form,
-      endereco: { ...form.endereco, [e.target.name]: e.target.value },
+      endereco: { ...form.endereco, [name]: value },
     });
+
+    if (name === "cep") {
+      buscarCep(value);
+    }
   }
 
   async function handleSubmit(e) {
@@ -626,11 +700,12 @@ function FormEmpresa({ onSubmit }) {
           <input
             className="cad-input"
             name="cep"
-            placeholder="00000-000"
+            placeholder={buscandoCep ? "Buscando CEP..." : "00000-000"}
             value={form.endereco.cep}
             onChange={handleEndereco}
             required
           />
+          {buscandoCep && <div className="cad-help">Buscando endereco...</div>}
         </div>
         <div className="cad-field">
           <label className="cad-label">Número</label>

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Spline from "@splinetool/react-spline";
 import LoginCard from "../../components/LoginCard";
 import { alunoService } from "../../services/alunoService";
@@ -51,6 +51,7 @@ const pageStyles = `
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   async function handleLogin(form) {
     try {
@@ -58,9 +59,11 @@ export default function Login() {
       localStorage.setItem("usuarioLogado", JSON.stringify(data));
       window.dispatchEvent(new Event("usuarioLogado"));
 
+      const rotaTentada = location.state?.from?.pathname;
+
       if (data.tipo === "ALUNO") navigate("/aluno/dashboard");
       else if (data.tipo === "PROFESSOR") navigate("/professor/dashboard");
-      else if (data.tipo === "EMPRESA_PARCEIRA") navigate("/empresa/dashboard");
+      else if (data.tipo === "EMPRESA_PARCEIRA") navigate(rotaTentada?.startsWith("/empresa/") ? rotaTentada : "/empresa/dashboard");
       else navigate("/");
     } catch (err) {
       toast.error(err.response?.data?.message || "E-mail ou senha inválidos.");

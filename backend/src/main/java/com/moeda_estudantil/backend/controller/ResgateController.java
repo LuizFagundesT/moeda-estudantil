@@ -5,6 +5,7 @@ import com.moeda_estudantil.backend.enums.StatusResgate;
 import com.moeda_estudantil.backend.service.ResgateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,20 @@ public class ResgateController {
     @GetMapping("/aluno/{alunoId}")
     public ResponseEntity<List<ResgateResponse>> listarPorAluno(@PathVariable Long alunoId) {
         return ResponseEntity.ok(resgateService.listarPorAluno(alunoId));
+    }
+
+    @GetMapping("/empresa/codigo/{codigoCupom}")
+    public ResponseEntity<ResgateResponse> buscarPorCodigoParaEmpresa(
+            @PathVariable String codigoCupom,
+            Authentication authentication) {
+        return ResponseEntity.ok(resgateService.buscarPorCodigoParaEmpresa(codigoCupom, authentication.getName()));
+    }
+
+    @PatchMapping("/empresa/codigo/{codigoCupom}/utilizar")
+    public ResponseEntity<ResgateResponse> confirmarUsoPorCodigo(
+            @PathVariable String codigoCupom,
+            Authentication authentication) {
+        return ResponseEntity.ok(resgateService.confirmarUsoPorCodigo(codigoCupom, authentication.getName()));
     }
 
     @PatchMapping("/{resgateId}/status/{status}")

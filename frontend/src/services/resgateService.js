@@ -10,6 +10,12 @@ export const resgateService = {
   listarPorAluno: (alunoId) =>
     api.get(`/resgates/aluno/${alunoId}`),
 
+  buscarPorCodigoParaEmpresa: (codigoCupom) =>
+    api.get(`/resgates/empresa/codigo/${encodeURIComponent(codigoCupom)}`),
+
+  confirmarUsoPorCodigo: (codigoCupom) =>
+    api.patch(`/resgates/empresa/codigo/${encodeURIComponent(codigoCupom)}/utilizar`),
+
   atualizarStatus: (resgateId, status) =>
     api.patch(`/resgates/${resgateId}/status/${status}`),
 };

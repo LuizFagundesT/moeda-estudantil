@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { empresaService } from "../../services/empresaService";
 import { vantagemService } from "../../services/vantagemService";
 import { resgateService } from "../../services/resgateService";
+import { cepService, formatarCep } from "../../services/cepService";
 import { toast } from "../shared/Toast";
 
 const emptyVantagem = {
@@ -27,6 +28,10 @@ const styles = `
   /* ── PAGE HEADER ── */
   .empresa-page-header {
     margin-bottom: 28px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
   }
 
   .empresa-page-title {
@@ -470,6 +475,7 @@ const styles = `
 
   @media (max-width: 620px) {
     .empresa-page { padding: 90px 16px 40px; }
+    .empresa-page-header { flex-direction: column; }
     .empresa-stats { grid-template-columns: 1fr 1fr; }
     .vantagens-grid { grid-auto-columns: minmax(240px, 85vw); }
     .resgate-item { grid-template-columns: 1fr; }
@@ -497,6 +503,8 @@ export default function EmpresaDashboard() {
   const [editandoPerfil, setEditandoPerfil] = useState(false);
   const [loading, setLoading] = useState(true);
   const [navAtivo, setNavAtivo] = useState("topo");
+  const [buscandoCepPerfil, setBuscandoCepPerfil] = useState(false);
+  const [ultimoCepPerfilBuscado, setUltimoCepPerfilBuscado] = useState("");
 
   const totalAtivas = useMemo(() => vantagens.filter((v) => v.ativa).length, [vantagens]);
   const custoMedio = useMemo(() => {
@@ -638,9 +646,39 @@ export default function EmpresaDashboard() {
     setFormPerfil((f) => ({ ...f, [name]: value }));
   }
 
+  async function buscarCepPerfil(cep) {
+    const cepLimpo = String(cep || "").replace(/\D/g, "");
+    if (cepLimpo.length !== 8 || cepLimpo === ultimoCepPerfilBuscado) return;
+
+    try {
+      setBuscandoCepPerfil(true);
+      const endereco = await cepService.buscarPorCep(cepLimpo);
+      setUltimoCepPerfilBuscado(cepLimpo);
+      setFormPerfil((atual) => ({
+        ...atual,
+        endereco: {
+          ...atual.endereco,
+          ...endereco,
+          numero: atual.endereco?.numero || "",
+          complemento: atual.endereco?.complemento || endereco.complemento,
+        },
+      }));
+    } catch (err) {
+      setUltimoCepPerfilBuscado("");
+      toast.error(err.message || "Nao foi possivel buscar o CEP.");
+    } finally {
+      setBuscandoCepPerfil(false);
+    }
+  }
+
   function handleEnderecoChange(e) {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    const value = name === "cep" ? formatarCep(e.target.value) : e.target.value;
     setFormPerfil((f) => ({ ...f, endereco: { ...f.endereco, [name]: value } }));
+
+    if (name === "cep") {
+      buscarCepPerfil(value);
+    }
   }
 
   async function salvarPerfil(e) {
@@ -676,8 +714,13 @@ export default function EmpresaDashboard() {
       <main className="empresa-page">
 
         <div className="empresa-page-header" id="topo">
-          <h1 className="empresa-page-title">{nomeExibido}</h1>
-          <p className="empresa-page-sub">Gerencie vantagens, resgates e dados da empresa.</p>
+          <div>
+            <h1 className="empresa-page-title">{nomeExibido}</h1>
+            <p className="empresa-page-sub">Gerencie vantagens, resgates e dados da empresa.</p>
+          </div>
+          <button className="empresa-btn-outline" type="button" onClick={() => navigate("/empresa/resgates/validar")}>
+            Validar resgate
+          </button>
         </div>
 
         <nav className="empresa-nav">
@@ -922,7 +965,11 @@ export default function EmpresaDashboard() {
                   <div className="empresa-field" key={campo}>
                     <label className="empresa-label">{label}</label>
                     <input className="empresa-input" name={campo}
+                      placeholder={campo === "cep" && buscandoCepPerfil ? "Buscando CEP..." : undefined}
                       value={formPerfil.endereco?.[campo] || ""} onChange={handleEnderecoChange} />
+                    {campo === "cep" && buscandoCepPerfil && (
+                      <span className="empresa-card-desc">Buscando endereco...</span>
+                    )}
                   </div>
                 ))}
               </div>
