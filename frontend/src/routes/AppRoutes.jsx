@@ -7,6 +7,7 @@ import Login from "../pages/auth/Login";
 import CadastroPage from "../pages/auth/CadastroPage";
 import AlunoDashboard from "../pages/aluno/AlunoDashboard";
 import EmpresaDashboard from "../pages/empresa/EmpresaDashboard";
+import ValidarResgate from "../pages/empresa/ValidarResgate";
 import ComoFunciona from "../pages/public/ComoFunciona";
 import Vantagens from "../pages/aluno/Vantagens";
 import Parceiros from "../pages/aluno/Parceiros";
@@ -47,6 +48,18 @@ export default function AppRoutes() {
         <Route path="/empresa/dashboard" element={
           <ProtectedRoute tipoPermitido="EMPRESA_PARCEIRA">
             <EmpresaDashboard />
+          </ProtectedRoute>
+        } />
+
+        <Route path="empresa/resgates/validar" element={
+          <ProtectedRoute tipoPermitido="EMPRESA_PARCEIRA">
+            <ValidarResgate />
+          </ProtectedRoute>
+        } />
+
+        <Route path="empresa/resgates/validar/:codigoCupom" element={
+          <ProtectedRoute tipoPermitido="EMPRESA_PARCEIRA">
+            <ValidarResgate />
           </ProtectedRoute>
         } />
 

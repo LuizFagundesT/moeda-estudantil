@@ -2,10 +2,12 @@ package com.moeda_estudantil.backend.service;
 
 import com.moeda_estudantil.backend.dto.ResgateResponse;
 import com.moeda_estudantil.backend.entity.Aluno;
+import com.moeda_estudantil.backend.entity.EmpresaParceira;
 import com.moeda_estudantil.backend.entity.Resgate;
 import com.moeda_estudantil.backend.entity.Vantagem;
 import com.moeda_estudantil.backend.enums.StatusResgate;
 import com.moeda_estudantil.backend.repository.AlunoRepository;
+import com.moeda_estudantil.backend.repository.EmpresaParceiraRepository;
 import com.moeda_estudantil.backend.repository.ResgateRepository;
 import com.moeda_estudantil.backend.repository.VantagemRepository;
 import jakarta.transaction.Transactional;
@@ -25,6 +27,7 @@ public class ResgateService {
 
     private final ResgateRepository resgateRepository;
     private final AlunoRepository alunoRepository;
+    private final EmpresaParceiraRepository empresaParceiraRepository;
     private final VantagemRepository vantagemRepository;
     private final TransacaoService transacaoService;
 
@@ -92,11 +95,55 @@ public class ResgateService {
     }
 
     @Transactional
+    public ResgateResponse buscarPorCodigoParaEmpresa(String codigoCupom, String emailEmpresa) {
+        Resgate resgate = buscarResgateDaEmpresaPorCodigo(codigoCupom, emailEmpresa);
+        return ResgateResponse.fromEntity(resgate);
+    }
+
+    @Transactional
+    public ResgateResponse confirmarUsoPorCodigo(String codigoCupom, String emailEmpresa) {
+        Resgate resgate = buscarResgateDaEmpresaPorCodigo(codigoCupom, emailEmpresa);
+
+        if (resgate.getStatus() == StatusResgate.UTILIZADO) {
+            throw new RuntimeException("Este resgate ja foi utilizado.");
+        }
+
+        if (resgate.getStatus() == StatusResgate.CANCELADO) {
+            throw new RuntimeException("Este resgate foi cancelado e nao pode ser utilizado.");
+        }
+
+        resgate.setStatus(StatusResgate.UTILIZADO);
+        return ResgateResponse.fromEntity(resgateRepository.save(resgate));
+    }
+
+    @Transactional
     public ResgateResponse atualizarStatus(Long resgateId, StatusResgate status) {
         Resgate resgate = resgateRepository.findById(resgateId)
                 .orElseThrow(() -> new RuntimeException("Resgate não encontrado: " + resgateId));
         resgate.setStatus(status);
         return ResgateResponse.fromEntity(resgateRepository.save(resgate));
+    }
+
+    private Resgate buscarResgateDaEmpresaPorCodigo(String codigoCupom, String emailEmpresa) {
+        String codigoNormalizado = normalizarCodigo(codigoCupom);
+        EmpresaParceira empresa = empresaParceiraRepository.findByEmail(emailEmpresa)
+                .orElseThrow(() -> new RuntimeException("Empresa logada nao encontrada."));
+        Resgate resgate = resgateRepository.findByCodigoCupom(codigoNormalizado)
+                .orElseThrow(() -> new RuntimeException("Resgate nao encontrado para o codigo informado."));
+
+        Long empresaDoResgateId = resgate.getEmpresaParceira().getId();
+        if (!empresaDoResgateId.equals(empresa.getId())) {
+            throw new RuntimeException("Este resgate nao pertence a empresa logada.");
+        }
+
+        return resgate;
+    }
+
+    private String normalizarCodigo(String codigoCupom) {
+        if (codigoCupom == null || codigoCupom.isBlank()) {
+            throw new RuntimeException("Codigo do cupom e obrigatorio.");
+        }
+        return codigoCupom.trim().toUpperCase();
     }
 
     private String gerarCodigoUnico() {
