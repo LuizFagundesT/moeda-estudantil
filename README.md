@@ -325,4 +325,8 @@ http://localhost:8080/swagger-ui/index.html
 - O projeto foi desenvolvido com foco acadêmico.
 - Toda a infraestrutura roda via Docker.
 - O RabbitMQ foi implementado para estudar arquitetura orientada a eventos e comunicação assíncrona.
+<<<<<<< Updated upstream
 - O envio de e-mails utiliza senha de aplicativo do Gmail.
+=======
+- O envio de e-mails utiliza senha de aplicativo do Gmail.
+>>>>>>> Stashed changes
