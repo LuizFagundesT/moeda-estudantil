@@ -1,0 +1,252 @@
+@startuml
+title Sistema de Moeda Estudantil - Diagrama de Sequência Geral
+
+skinparam sequence {
+  LifeLineBorderColor #444
+  LifeLineBackgroundColor #F7F7F7
+  ParticipantBorderColor #444
+  ParticipantBackgroundColor #FFFFFF
+  ActorBorderColor #444
+  ActorBackgroundColor #FFFFFF
+  ArrowColor #333
+  ActivationBorderColor #333
+  ActivationBackgroundColor #D9EAF7
+}
+
+actor Aluno
+actor Professor
+actor "Empresa Parceira" as Empresa
+
+boundary "Interface Web" as UI
+control "Sistema" as Sistema
+control "Serviço de Autenticação" as Auth
+control "Serviço de Moedas" as Moedas
+control "Serviço de Vantagens" as Vantagens
+control "Serviço de Email" as Email
+database "Banco de Dados" as BD
+
+autonumber
+
+== Cadastro e autenticação ==
+
+Aluno -> UI : informa dados de cadastro
+activate UI
+
+UI -> Sistema : cadastrarAluno(dados)
+activate Sistema
+
+Sistema -> BD : validarInstituicao(instituicao)
+activate BD
+BD --> Sistema : instituição válida
+deactivate BD
+
+Sistema -> BD : salvarAluno(dados)
+activate BD
+BD --> Sistema : aluno cadastrado
+deactivate BD
+
+Sistema --> UI : cadastro realizado
+deactivate Sistema
+
+UI --> Aluno : exibe confirmação
+deactivate UI
+
+
+Aluno -> UI : informa login e senha
+activate UI
+
+UI -> Auth : autenticar(email, senha)
+activate Auth
+
+Auth -> BD : buscarUsuario(email)
+activate BD
+BD --> Auth : dados do usuário
+deactivate BD
+
+Auth --> UI : acesso autorizado
+deactivate Auth
+
+UI --> Aluno : exibe área do aluno
+deactivate UI
+
+
+== Envio de moedas pelo professor ==
+
+Professor -> UI : informa aluno, quantidade e motivo
+activate UI
+
+UI -> Auth : validarSessao(professor)
+activate Auth
+Auth --> UI : sessão válida
+deactivate Auth
+
+UI -> Sistema : enviarMoedas(aluno, valor, motivo)
+activate Sistema
+
+Sistema -> Moedas : verificarSaldoProfessor(professor, valor)
+activate Moedas
+
+Moedas -> BD : consultarSaldo(professor)
+activate BD
+BD --> Moedas : saldo atual
+deactivate BD
+
+alt saldo suficiente
+    Moedas -> BD : debitarMoedas(professor, valor)
+    activate BD
+    BD --> Moedas : débito realizado
+    deactivate BD
+
+    Moedas -> BD : creditarMoedas(aluno, valor)
+    activate BD
+    BD --> Moedas : crédito realizado
+    deactivate BD
+
+    Moedas -> BD : registrarTransacao(professor, aluno, valor, motivo)
+    activate BD
+    BD --> Moedas : transação registrada
+    deactivate BD
+
+    Moedas --> Sistema : envio concluído
+    deactivate Moedas
+
+    Sistema -> Email : enviarNotificacaoAluno(aluno, valor, motivo)
+    activate Email
+    Email --> Sistema : email enviado
+    deactivate Email
+
+    Sistema --> UI : moedas enviadas com sucesso
+else saldo insuficiente
+    Moedas --> Sistema : saldo insuficiente
+    deactivate Moedas
+
+    Sistema --> UI : erro ao enviar moedas
+end
+
+deactivate Sistema
+
+UI --> Professor : exibe resultado da operação
+deactivate UI
+
+
+== Cadastro de vantagem pela empresa ==
+
+Empresa -> UI : informa descrição, foto e custo da vantagem
+activate UI
+
+UI -> Auth : validarSessao(empresa)
+activate Auth
+Auth --> UI : sessão válida
+deactivate Auth
+
+UI -> Vantagens : cadastrarVantagem(dados)
+activate Vantagens
+
+Vantagens -> BD : salvarVantagem(dados)
+activate BD
+BD --> Vantagens : vantagem cadastrada
+deactivate BD
+
+Vantagens --> UI : cadastro realizado
+deactivate Vantagens
+
+UI --> Empresa : exibe confirmação
+deactivate UI
+
+
+== Resgate de vantagem pelo aluno ==
+
+Aluno -> UI : seleciona vantagem para resgate
+activate UI
+
+UI -> Auth : validarSessao(aluno)
+activate Auth
+Auth --> UI : sessão válida
+deactivate Auth
+
+UI -> Sistema : resgatarVantagem(aluno, vantagem)
+activate Sistema
+
+Sistema -> Vantagens : consultarVantagem(vantagem)
+activate Vantagens
+
+Vantagens -> BD : buscarVantagem(vantagem)
+activate BD
+BD --> Vantagens : dados da vantagem
+deactivate BD
+
+Vantagens --> Sistema : custo e dados da vantagem
+deactivate Vantagens
+
+Sistema -> Moedas : verificarSaldoAluno(aluno, custo)
+activate Moedas
+
+Moedas -> BD : consultarSaldo(aluno)
+activate BD
+BD --> Moedas : saldo atual
+deactivate BD
+
+alt saldo suficiente
+    Moedas -> BD : debitarMoedas(aluno, custo)
+    activate BD
+    BD --> Moedas : débito realizado
+    deactivate BD
+
+    Moedas -> BD : registrarResgate(aluno, vantagem, codigo)
+    activate BD
+    BD --> Moedas : resgate registrado
+    deactivate BD
+
+    Moedas --> Sistema : resgate concluído
+    deactivate Moedas
+
+    Sistema -> Email : enviarCupomAluno(aluno, codigo)
+    activate Email
+    Email --> Sistema : email enviado ao aluno
+    deactivate Email
+
+    Sistema -> Email : enviarAvisoParceiro(empresa, codigo)
+    activate Email
+    Email --> Sistema : email enviado à empresa
+    deactivate Email
+
+    Sistema --> UI : resgate realizado com sucesso
+else saldo insuficiente
+    Moedas --> Sistema : saldo insuficiente
+    deactivate Moedas
+
+    Sistema --> UI : erro ao resgatar vantagem
+end
+
+deactivate Sistema
+
+UI --> Aluno : exibe resultado do resgate
+deactivate UI
+
+
+== Consulta de extrato ==
+
+Aluno -> UI : solicita extrato
+activate UI
+
+UI -> Sistema : consultarExtrato(aluno)
+activate Sistema
+
+Sistema -> Moedas : buscarSaldoETransacoes(aluno)
+activate Moedas
+
+Moedas -> BD : consultarExtrato(aluno)
+activate BD
+BD --> Moedas : saldo e transações
+deactivate BD
+
+Moedas --> Sistema : dados do extrato
+deactivate Moedas
+
+Sistema --> UI : retorna extrato
+deactivate Sistema
+
+UI --> Aluno : exibe saldo e transações
+deactivate UI
+
+@enduml
