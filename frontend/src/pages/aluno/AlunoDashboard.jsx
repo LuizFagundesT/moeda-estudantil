@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { alunoService } from "../../services/alunoService";
+import { resgateService } from "../../services/resgateService"; // ← novo import
 import { toast } from "../shared/Toast";
 
+/* ─────────────────────────────────────────
+   STYLES
+───────────────────────────────────────── */
 const styles = `
   .aluno-page {
     min-height: 100vh;
@@ -13,25 +17,12 @@ const styles = `
     box-sizing: border-box;
   }
 
-  /* ── PAGE HEADER ── */
-  .aluno-page-header {
-    margin-bottom: 32px;
-  }
+  /* PAGE HEADER */
+  .aluno-page-header { margin-bottom: 32px; }
+  .aluno-page-title  { font-size: 26px; font-weight: 700; margin: 0 0 4px; color: #26215C; }
+  .aluno-page-sub    { font-size: 13px; color: rgba(83,74,183,.6); margin: 0; }
 
-  .aluno-page-title {
-    font-size: 26px;
-    font-weight: 700;
-    margin: 0 0 4px;
-    color: #26215C;
-  }
-
-  .aluno-page-sub {
-    font-size: 13px;
-    color: rgba(83,74,183,.6);
-    margin: 0;
-  }
-
-  /* ── GRID LAYOUT ── */
+  /* GRID */
   .aluno-grid {
     display: grid;
     grid-template-columns: 320px 1fr;
@@ -39,7 +30,7 @@ const styles = `
     align-items: start;
   }
 
-  /* ── SALDO CARD ── */
+  /* SALDO CARD */
   .saldo-card {
     background: linear-gradient(135deg, #534AB7, #7F77DD);
     color: #fff;
@@ -49,54 +40,27 @@ const styles = `
     position: relative;
     overflow: hidden;
   }
-
   .saldo-card::before {
     content: "";
     position: absolute;
-    top: -40px;
-    right: -40px;
-    width: 160px;
-    height: 160px;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
     border-radius: 50%;
     background: rgba(255,255,255,.08);
   }
-
   .saldo-card::after {
     content: "";
     position: absolute;
-    bottom: -30px;
-    left: -20px;
-    width: 100px;
-    height: 100px;
+    bottom: -30px; left: -20px;
+    width: 100px; height: 100px;
     border-radius: 50%;
     background: rgba(255,255,255,.05);
   }
+  .saldo-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.65); margin: 0 0 12px; }
+  .saldo-valor { font-size: 42px; font-weight: 700; margin: 0; line-height: 1; letter-spacing: -1px; }
+  .saldo-moeda { font-size: 16px; font-weight: 400; color: rgba(255,255,255,.7); margin: 8px 0 0; }
 
-  .saldo-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,.65);
-    margin: 0 0 12px;
-  }
-
-  .saldo-valor {
-    font-size: 42px;
-    font-weight: 700;
-    margin: 0;
-    line-height: 1;
-    letter-spacing: -1px;
-  }
-
-  .saldo-moeda {
-    font-size: 16px;
-    font-weight: 400;
-    color: rgba(255,255,255,.7);
-    margin: 8px 0 0;
-  }
-
-  /* ── GLASS CARD ── */
+  /* GLASS CARD */
   .aluno-card {
     background: rgba(220,232,248,0.55);
     backdrop-filter: blur(20px);
@@ -106,14 +70,12 @@ const styles = `
     padding: 26px;
     box-shadow: 0 4px 20px rgba(83,74,183,.10);
   }
-
   .aluno-card-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 18px;
   }
-
   .aluno-card-title {
     font-size: 11px;
     font-weight: 700;
@@ -123,13 +85,8 @@ const styles = `
     margin: 0;
   }
 
-  /* ── INFO GRID ── */
-  .aluno-info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
+  /* INFO GRID */
+  .aluno-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .aluno-info-item label {
     display: block;
     font-size: 10px;
@@ -139,20 +96,40 @@ const styles = `
     color: rgba(60,52,137,.55);
     margin-bottom: 4px;
   }
+  .aluno-info-item span { font-size: 14px; color: #26215C; font-weight: 600; }
 
-  .aluno-info-item span {
-    font-size: 14px;
-    color: #26215C;
-    font-weight: 600;
-  }
-
-  /* ── EXTRATO ── */
-  .extrato-lista {
+  /* TABS */
+  .tabs-bar {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,.3);
+    border-radius: 12px;
+    padding: 4px;
+  }
+  .tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-radius: 9px;
+    padding: 9px 0;
+    font-family: 'Play', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: rgba(83,74,183,.5);
+    cursor: pointer;
+    transition: all .18s;
+  }
+  .tab-btn.ativo {
+    background: linear-gradient(135deg, #534AB7, #7F77DD);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(83,74,183,.25);
   }
 
+  /* EXTRATO */
+  .extrato-lista { display: flex; flex-direction: column; gap: 2px; }
   .extrato-item {
     display: flex;
     align-items: center;
@@ -161,56 +138,71 @@ const styles = `
     border-radius: 12px;
     transition: background .15s;
   }
-
-  .extrato-item:hover {
-    background: rgba(255,255,255,.35);
-  }
-
-  .extrato-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .extrato-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
+  .extrato-item:hover { background: rgba(255,255,255,.35); }
+  .extrato-left { display: flex; align-items: center; gap: 12px; }
+  .extrato-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .extrato-dot.entrada { background: #22c55e; }
   .extrato-dot.saida   { background: #ef4444; }
-
-  .extrato-desc {
-    font-size: 13px;
-    color: #26215C;
-  }
-
-  .extrato-tipo {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: .8px;
-    text-transform: uppercase;
-    color: rgba(83,74,183,.55);
-  }
-
-  .extrato-valor {
-    font-size: 14px;
-    font-weight: 700;
-  }
-
+  .extrato-desc  { font-size: 13px; color: #26215C; }
+  .extrato-tipo  { font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: rgba(83,74,183,.55); }
+  .extrato-valor { font-size: 14px; font-weight: 700; }
   .extrato-valor.entrada { color: #22c55e; }
   .extrato-valor.saida   { color: #ef4444; }
 
-  .extrato-vazio {
+  /* RESGATES */
+  .resgates-lista { display: flex; flex-direction: column; gap: 8px; }
+  .resgate-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.3);
+    transition: background .15s;
+  }
+  .resgate-item:hover { background: rgba(255,255,255,.5); }
+  .resgate-left  { display: flex; flex-direction: column; gap: 3px; }
+  .resgate-nome  { font-size: 13px; font-weight: 700; color: #26215C; }
+  .resgate-cupom { font-size: 11px; letter-spacing: 1.2px; color: rgba(83,74,183,.55); font-weight: 600; }
+  .resgate-valor { font-size: 13px; font-weight: 700; color: #534AB7; }
+
+  /* STATUS BADGE */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .7px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  .badge.PENDENTE    { background: rgba(234,179,8,.15);  color: #a16207; }
+  .badge.PENDENTE .badge-dot { background: #eab308; }
+
+  .badge.UTILIZADO   { background: rgba(34,197,94,.13);  color: #15803d; }
+  .badge.UTILIZADO .badge-dot { background: #22c55e; }
+
+  .badge.EXPIRADO    { background: rgba(239,68,68,.12);  color: #b91c1c; }
+  .badge.EXPIRADO .badge-dot { background: #ef4444; }
+
+  .badge.CANCELADO   { background: rgba(100,116,139,.13); color: #475569; }
+  .badge.CANCELADO .badge-dot { background: #94a3b8; }
+
+  /* EMPTY / LOADING */
+  .lista-vazia {
     text-align: center;
-    padding: 24px;
+    padding: 32px 24px;
     color: rgba(83,74,183,.45);
     font-size: 13px;
   }
+  .lista-vazia span { display: block; font-size: 28px; margin-bottom: 8px; }
 
-  /* ── BUTTONS ── */
+  /* BUTTONS */
   .aluno-btn {
     background: linear-gradient(135deg, #534AB7, #7F77DD);
     color: #fff;
@@ -225,12 +217,7 @@ const styles = `
     transition: all .2s;
     white-space: nowrap;
   }
-
-  .aluno-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(83,74,183,.3);
-  }
-
+  .aluno-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(83,74,183,.3); }
   .aluno-btn-outline {
     background: transparent;
     color: #534AB7;
@@ -244,12 +231,9 @@ const styles = `
     letter-spacing: .8px;
     transition: all .2s;
   }
+  .aluno-btn-outline:hover { background: rgba(83,74,183,.06); }
 
-  .aluno-btn-outline:hover {
-    background: rgba(83,74,183,.06);
-  }
-
-  /* ── MODAL ── */
+  /* MODAL */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -260,7 +244,6 @@ const styles = `
     justify-content: center;
     z-index: 200;
   }
-
   .modal-box {
     background: rgba(235,240,255,0.96);
     backdrop-filter: blur(20px);
@@ -270,30 +253,10 @@ const styles = `
     width: 380px;
     box-shadow: 0 24px 60px rgba(38,33,92,.2);
   }
-
-  .modal-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #26215C;
-    margin: 0 0 20px;
-  }
-
-  .modal-field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 14px;
-  }
-
-  .modal-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: rgba(60,52,137,.65);
-  }
-
-  .modal-input {
+  .modal-title  { font-size: 18px; font-weight: 700; color: #26215C; margin: 0 0 20px; }
+  .modal-field  { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .modal-label  { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(60,52,137,.65); }
+  .modal-input  {
     padding: 12px 14px;
     border-radius: 12px;
     border: 1px solid rgba(83,74,183,.2);
@@ -304,19 +267,10 @@ const styles = `
     outline: none;
     transition: border .2s, box-shadow .2s;
   }
+  .modal-input:focus { border-color: #534AB7; box-shadow: 0 0 0 4px rgba(83,74,183,.08); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
 
-  .modal-input:focus {
-    border-color: #534AB7;
-    box-shadow: 0 0 0 4px rgba(83,74,183,.08);
-  }
-
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-  }
-
-  /* ── LOADING ── */
+  /* LOADING */
   .aluno-loading {
     min-height: 100vh;
     display: flex;
@@ -329,20 +283,44 @@ const styles = `
   }
 
   @media (max-width: 900px) {
-    .aluno-grid { grid-template-columns: 1fr; }
-    .aluno-page { padding: 90px 20px 40px; }
+    .aluno-grid  { grid-template-columns: 1fr; }
+    .aluno-page  { padding: 90px 20px 40px; }
   }
-
   @media (max-width: 500px) {
     .aluno-info-grid { grid-template-columns: 1fr; }
   }
 `;
 
+/* ─────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────── */
+const STATUS_LABEL = {
+  PENDENTE:  "Pendente",
+  UTILIZADO: "Utilizado",
+  EXPIRADO:  "Expirado",
+  CANCELADO: "Cancelado",
+};
+
+function StatusBadge({ status }) {
+  const label = STATUS_LABEL[status] ?? status;
+  return (
+    <span className={`badge ${status}`}>
+      <span className="badge-dot" />
+      {label}
+    </span>
+  );
+}
+
+/* ─────────────────────────────────────────
+   COMPONENT
+───────────────────────────────────────── */
 export default function AlunoDashboard() {
   const navigate = useNavigate();
 
-  const [aluno, setAluno] = useState(null);
-  const [extrato, setExtrato] = useState([]);
+  const [aluno,    setAluno]    = useState(null);
+  const [extrato,  setExtrato]  = useState([]);
+  const [resgates, setResgates] = useState([]);
+  const [aba,      setAba]      = useState("extrato"); // "extrato" | "resgates"
   const [editando, setEditando] = useState(false);
   const [formEdit, setFormEdit] = useState({});
 
@@ -356,7 +334,10 @@ export default function AlunoDashboard() {
       const meuAluno = data.find((a) => a.email === usuarioLogado?.email);
       if (meuAluno) {
         setAluno(meuAluno);
-        carregarExtrato(meuAluno.id);
+        await Promise.all([
+          carregarExtrato(meuAluno.id),
+          carregarResgates(meuAluno.id),
+        ]);
       }
     } catch {
       navigate("/login");
@@ -365,10 +346,19 @@ export default function AlunoDashboard() {
 
   async function carregarExtrato(id) {
     try {
-      const res = await alunoService.extrato(id);
-      setExtrato(res.data);
+      const { data } = await alunoService.extrato(id);
+      setExtrato(data);
     } catch (err) {
       console.error("Erro extrato", err);
+    }
+  }
+
+  async function carregarResgates(id) {
+    try {
+      const { data } = await resgateService.listarPorAluno(id);
+      setResgates(data);
+    } catch (err) {
+      console.error("Erro resgates", err);
     }
   }
 
@@ -407,12 +397,12 @@ export default function AlunoDashboard() {
 
         <div className="aluno-page-header">
           <h1 className="aluno-page-title">Bem-vindo, {primeiroNome}</h1>
-          <p className="aluno-page-sub">Acompanhe seu saldo e movimentações de KRN.</p>
+          <p className="aluno-page-sub">Acompanhe seu saldo, movimentações e resgates de KRN.</p>
         </div>
 
         <div className="aluno-grid">
 
-          {/* Coluna esquerda */}
+          {/* ── Coluna esquerda ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
             <div className="saldo-card">
@@ -448,37 +438,80 @@ export default function AlunoDashboard() {
 
           </div>
 
-          {/* Coluna direita — Extrato */}
+          {/* ── Coluna direita — Tabs ── */}
           <div className="aluno-card" style={{ minHeight: 300 }}>
-            <div className="aluno-card-head">
-              <p className="aluno-card-title">Extrato</p>
+
+            {/* Tab bar */}
+            <div className="tabs-bar">
+              <button
+                className={`tab-btn ${aba === "extrato" ? "ativo" : ""}`}
+                onClick={() => setAba("extrato")}
+              >
+                Extrato
+              </button>
+              <button
+                className={`tab-btn ${aba === "resgates" ? "ativo" : ""}`}
+                onClick={() => setAba("resgates")}
+              >
+                Resgates {resgates.length > 0 && `(${resgates.length})`}
+              </button>
             </div>
 
-            {extrato.length === 0 ? (
-              <div className="extrato-vazio">Nenhuma movimentação registrada.</div>
-            ) : (
-              <div className="extrato-lista">
-                {extrato.map((t, i) => {
-                  const tipo = t.tipo === "ENTRADA" ? "entrada" : "saida";
-                  return (
-                    <div key={i} className="extrato-item">
-                      <div className="extrato-left">
-                        <div className={`extrato-dot ${tipo}`} />
-                        <div>
-                          <div className="extrato-desc">{t.descricao || "—"}</div>
-                          <div className="extrato-tipo">{t.tipo}</div>
+            {/* Conteúdo da aba */}
+            {aba === "extrato" && (
+              extrato.length === 0 ? (
+                <div className="lista-vazia">
+                  <span>📭</span>
+                  Nenhuma movimentação registrada.
+                </div>
+              ) : (
+                <div className="extrato-lista">
+                  {extrato.map((t, i) => {
+                    const tipo = t.tipo === "ENTRADA" ? "entrada" : "saida";
+                    return (
+                      <div key={i} className="extrato-item">
+                        <div className="extrato-left">
+                          <div className={`extrato-dot ${tipo}`} />
+                          <div>
+                            <div className="extrato-desc">{t.descricao || "—"}</div>
+                            <div className="extrato-tipo">{t.tipo}</div>
+                          </div>
                         </div>
+                        <span className={`extrato-valor ${tipo}`}>
+                          {tipo === "entrada" ? "+" : "-"}{t.valor} KRN
+                        </span>
                       </div>
-                      <span className={`extrato-valor ${tipo}`}>
-                        {tipo === "entrada" ? "+" : "-"}{t.valor} KRN
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )
             )}
-          </div>
 
+            {aba === "resgates" && (
+              resgates.length === 0 ? (
+                <div className="lista-vazia">
+                  <span>🎟️</span>
+                  Nenhum resgate encontrado.
+                </div>
+              ) : (
+                <div className="resgates-lista">
+                  {resgates.map((r) => (
+                    <div key={r.id} className="resgate-item">
+                      <div className="resgate-left">
+                        <span className="resgate-nome">{r.vantagem?.descricao ?? "Vantagem"}</span>
+                        <span className="resgate-cupom">🎟 {r.codigoCupom}</span>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <span className="resgate-valor">-{r.valor} KRN</span>
+                        <StatusBadge status={r.status} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
+
+          </div>
         </div>
       </div>
 

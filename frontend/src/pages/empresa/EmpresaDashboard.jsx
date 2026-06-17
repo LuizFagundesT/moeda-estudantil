@@ -15,6 +15,27 @@ const emptyVantagem = {
   ativa: true,
 };
 
+/* ─── MODAL DE CONFIRMAÇÃO ─────────────────────────────── */
+function ConfirmModal({ titulo, mensagem, labelConfirmar = "Confirmar", perigoso = false, onConfirmar, onCancelar }) {
+  return (
+    <div className="confirm-overlay" onClick={onCancelar}>
+      <div className="confirm-box" onClick={(e) => e.stopPropagation()}>
+        <div className={`confirm-icon ${perigoso ? "danger" : "default"}`}>
+          {perigoso ? "⚠️" : "❓"}
+        </div>
+        <h3 className="confirm-title">{titulo}</h3>
+        <p className="confirm-msg">{mensagem}</p>
+        <div className="confirm-actions">
+          <button className="empresa-btn-outline" onClick={onCancelar}>Cancelar</button>
+          <button className={perigoso ? "empresa-btn-danger-solid" : "empresa-btn"} onClick={onConfirmar}>
+            {labelConfirmar}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const styles = `
   .empresa-page {
     min-height: 100vh;
@@ -25,7 +46,7 @@ const styles = `
     box-sizing: border-box;
   }
 
-  /* ── PAGE HEADER ── */
+  /* PAGE HEADER */
   .empresa-page-header {
     margin-bottom: 28px;
     display: flex;
@@ -33,68 +54,39 @@ const styles = `
     gap: 16px;
     align-items: flex-start;
   }
+  .empresa-page-title { font-size: 26px; font-weight: 700; margin: 0 0 4px; color: #26215C; }
+  .empresa-page-sub   { font-size: 13px; color: rgba(83,74,183,.6); margin: 0; }
 
-  .empresa-page-title {
-    font-size: 26px;
-    font-weight: 700;
-    margin: 0 0 4px;
-    color: #26215C;
-  }
-
-  .empresa-page-sub {
-    font-size: 13px;
-    color: rgba(83,74,183,.6);
-    margin: 0;
-  }
-
-  /* ── NAV PILLS ── */
+  /* NAV PILLS */
   .empresa-nav {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    margin-bottom: 28px;
-    scrollbar-width: none;
+    display: flex; gap: 8px;
+    overflow-x: auto; padding-bottom: 4px;
+    margin-bottom: 28px; scrollbar-width: none;
   }
-
   .empresa-nav::-webkit-scrollbar { display: none; }
-
   .empresa-nav button {
     flex: 0 0 auto;
     border: 1px solid rgba(83,74,183,.18);
     background: rgba(255,255,255,.35);
     color: rgba(38,33,92,.72);
-    padding: 10px 18px;
-    border-radius: 999px;
-    cursor: pointer;
-    font-family: 'Play', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: .6px;
-    transition: all .2s;
-    white-space: nowrap;
+    padding: 10px 18px; border-radius: 999px;
+    cursor: pointer; font-family: 'Play', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: .6px;
+    transition: all .2s; white-space: nowrap;
   }
-
-  .empresa-nav button:hover {
-    background: rgba(255,255,255,.55);
-    color: #534AB7;
-  }
-
+  .empresa-nav button:hover { background: rgba(255,255,255,.55); color: #534AB7; }
   .empresa-nav button.active {
     background: linear-gradient(135deg, #534AB7, #7F77DD);
-    color: #fff;
-    border-color: transparent;
+    color: #fff; border-color: transparent;
     box-shadow: 0 6px 18px rgba(83,74,183,.22);
   }
 
-  /* ── STATS GRID ── */
+  /* STATS GRID */
   .empresa-stats {
     display: grid;
     grid-template-columns: repeat(4, minmax(150px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: 16px; margin-bottom: 24px;
   }
-
   .empresa-stat {
     background: rgba(220,232,248,0.55);
     backdrop-filter: blur(20px);
@@ -104,365 +96,255 @@ const styles = `
     box-shadow: 0 4px 20px rgba(83,74,183,.08);
     padding: 22px;
   }
-
   .empresa-stat-label {
-    display: block;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: rgba(60,52,137,0.55);
-    margin-bottom: 10px;
+    display: block; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: rgba(60,52,137,0.55); margin-bottom: 10px;
   }
+  .empresa-stat-value { font-size: 30px; font-weight: 700; color: #26215C; line-height: 1; }
+  .empresa-stat-unit  { font-size: 12px; color: rgba(83,74,183,.55); margin-top: 6px; }
 
-  .empresa-stat-value {
-    font-size: 30px;
-    font-weight: 700;
-    color: #26215C;
-    line-height: 1;
-  }
-
-  .empresa-stat-unit {
-    font-size: 12px;
-    color: rgba(83,74,183,.55);
-    margin-top: 6px;
-  }
-
-  /* ── GLASS CARD ── */
+  /* GLASS CARD */
   .empresa-card {
     background: rgba(220,232,248,0.55);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255,255,255,0.48);
     border-radius: 22px;
-    padding: 28px;
-    margin-bottom: 20px;
+    padding: 28px; margin-bottom: 20px;
     box-shadow: 0 4px 20px rgba(83,74,183,.10);
   }
-
   .empresa-card-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 22px;
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 16px; margin-bottom: 22px;
   }
-
   .empresa-card-title {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: rgba(83,74,183,.7);
-    margin: 0 0 4px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: rgba(83,74,183,.7); margin: 0 0 4px;
   }
+  .empresa-card-desc { font-size: 13px; color: rgba(38,33,92,.55); margin: 0; }
 
-  .empresa-card-desc {
-    font-size: 13px;
-    color: rgba(38,33,92,.55);
-    margin: 0;
-  }
-
-  /* ── FORM ── */
+  /* FORM */
   .empresa-form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(200px, 1fr));
     gap: 16px;
   }
-
-  .empresa-field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .empresa-field.full {
-    grid-column: 1 / -1;
-  }
-
+  .empresa-field { display: flex; flex-direction: column; gap: 6px; }
+  .empresa-field.full { grid-column: 1 / -1; }
   .empresa-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: rgba(60,52,137,0.65);
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: rgba(60,52,137,0.65);
   }
-
+  .empresa-label.destaque {
+    color: #534AB7;
+    font-size: 11px;
+  }
   .empresa-input,
   .empresa-textarea {
-    padding: 12px 14px;
-    border-radius: 12px;
+    padding: 12px 14px; border-radius: 12px;
     border: 1px solid rgba(83,74,183,.2);
     background: rgba(255,255,255,.55);
-    font-family: 'Play', sans-serif;
-    font-size: 13px;
-    color: #26215C;
-    outline: none;
-    transition: border .2s, box-shadow .2s;
-    box-sizing: border-box;
-    width: 100%;
+    font-family: 'Play', sans-serif; font-size: 13px; color: #26215C;
+    outline: none; transition: border .2s, box-shadow .2s;
+    box-sizing: border-box; width: 100%;
   }
-
   .empresa-input:focus,
   .empresa-textarea:focus {
     border-color: #534AB7;
     box-shadow: 0 0 0 4px rgba(83,74,183,.08);
   }
-
-  .empresa-textarea {
-    min-height: 96px;
-    resize: vertical;
+  /* Campo destaque — custo em KRN */
+  .empresa-input.destaque {
+    border-color: rgba(83,74,183,.4);
+    background: rgba(83,74,183,.05);
+    font-size: 15px;
+    font-weight: 700;
+    color: #534AB7;
   }
-
+  .empresa-input.destaque:focus {
+    border-color: #534AB7;
+    box-shadow: 0 0 0 4px rgba(83,74,183,.12);
+  }
+  .empresa-textarea { min-height: 96px; resize: vertical; }
   .empresa-checkbox-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    grid-column: 1 / -1;
-    padding: 4px 0;
+    display: flex; align-items: center; gap: 10px;
+    grid-column: 1 / -1; padding: 4px 0;
   }
-
   .empresa-checkbox-row input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #534AB7;
-    cursor: pointer;
+    width: 16px; height: 16px; accent-color: #534AB7; cursor: pointer;
   }
-
   .empresa-form-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    flex-wrap: wrap;
+    display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;
   }
 
-  /* ── BUTTONS ── */
+  /* BUTTONS */
   .empresa-btn,
   .empresa-btn-outline,
   .empresa-btn-danger,
-  .empresa-btn-muted {
-    border: none;
-    cursor: pointer;
-    padding: 11px 20px;
-    border-radius: 12px;
-    font-family: 'Play', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: .8px;
-    transition: all .2s;
-    white-space: nowrap;
+  .empresa-btn-danger-solid,
+  .empresa-btn-muted,
+  .empresa-btn-cta {
+    border: none; cursor: pointer; padding: 11px 20px;
+    border-radius: 12px; font-family: 'Play', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: .8px;
+    transition: all .2s; white-space: nowrap;
   }
-
   .empresa-btn {
     background: linear-gradient(135deg, #534AB7, #7F77DD);
-    color: #fff;
-    box-shadow: 0 6px 18px rgba(83,74,183,.22);
+    color: #fff; box-shadow: 0 6px 18px rgba(83,74,183,.22);
+  }
+  .empresa-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(83,74,183,.35); }
+
+  /* CTA — "Validar resgate" — mais vivo */
+  .empresa-btn-cta {
+    background: linear-gradient(135deg, #EF9F27, #FAC775);
+    color: #26215C;
+    box-shadow: 0 6px 22px rgba(239,159,39,.38);
+    padding: 12px 26px;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+  .empresa-btn-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(239,159,39,.5);
   }
 
   .empresa-btn-outline {
-    background: transparent;
-    color: #534AB7;
+    background: transparent; color: #534AB7;
     border: 1px solid rgba(83,74,183,.3);
   }
+  .empresa-btn-outline:hover { background: rgba(83,74,183,.06); transform: translateY(-1px); }
 
   .empresa-btn-danger {
-    background: rgba(220,53,69,.10);
-    color: #b42336;
+    background: rgba(220,53,69,.10); color: #b42336;
     border: 1px solid rgba(180,35,54,.20);
   }
+  .empresa-btn-danger:hover { transform: translateY(-1px); background: rgba(220,53,69,.16); }
+
+  .empresa-btn-danger-solid {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: #fff; box-shadow: 0 4px 14px rgba(220,38,38,.3);
+  }
+  .empresa-btn-danger-solid:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(220,38,38,.45); }
 
   .empresa-btn-muted {
-    background: rgba(83,74,183,.08);
-    color: #534AB7;
+    background: rgba(83,74,183,.08); color: #534AB7;
   }
+  .empresa-btn-muted:hover { transform: translateY(-1px); background: rgba(83,74,183,.14); }
 
-  .empresa-btn:hover,
-  .empresa-btn-outline:hover,
-  .empresa-btn-danger:hover,
-  .empresa-btn-muted:hover {
-    transform: translateY(-1px);
-  }
-
-  /* ── VANTAGENS CAROUSEL ── */
+  /* VANTAGENS CAROUSEL */
   .vantagens-grid {
-    display: grid;
-    grid-auto-flow: column;
+    display: grid; grid-auto-flow: column;
     grid-auto-columns: minmax(270px, 320px);
-    gap: 16px;
-    overflow-x: auto;
-    padding: 4px 4px 14px;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
+    gap: 16px; overflow-x: auto; padding: 4px 4px 14px;
+    scroll-snap-type: x mandatory; scrollbar-width: none;
   }
-
   .vantagens-grid::-webkit-scrollbar { display: none; }
-
   .vantagem-card {
     scroll-snap-align: start;
     background: rgba(255,255,255,.5);
     border: 1px solid rgba(255,255,255,.65);
-    border-radius: 18px;
-    overflow: hidden;
+    border-radius: 18px; overflow: hidden;
     box-shadow: 0 4px 18px rgba(83,74,183,.09);
-    display: flex;
-    flex-direction: column;
+    display: flex; flex-direction: column;
   }
-
   .vantagem-img {
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
+    width: 100%; height: 140px; object-fit: cover;
     background: linear-gradient(135deg, rgba(83,74,183,.15), rgba(127,119,221,.08));
     flex-shrink: 0;
   }
-
-  .vantagem-body {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-
-  .vantagem-title {
-    font-size: 15px;
-    font-weight: 700;
-    margin: 0 0 6px;
-    color: #26215C;
-  }
-
-  .vantagem-desc {
-    font-size: 12px;
-    color: rgba(38,33,92,.65);
-    line-height: 1.5;
-    flex: 1;
-  }
-
-  .vantagem-meta {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin: 14px 0 12px;
-  }
-
+  .vantagem-body { padding: 16px; display: flex; flex-direction: column; flex: 1; }
+  .vantagem-title { font-size: 15px; font-weight: 700; margin: 0 0 6px; color: #26215C; }
+  .vantagem-desc  { font-size: 12px; color: rgba(38,33,92,.65); line-height: 1.5; flex: 1; }
+  .vantagem-meta  { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 12px; }
   .vtag {
-    border-radius: 999px;
-    padding: 5px 10px;
-    background: rgba(83,74,183,.10);
-    color: #534AB7;
-    font-size: 11px;
-    font-weight: 700;
+    border-radius: 999px; padding: 5px 10px;
+    background: rgba(83,74,183,.10); color: #534AB7;
+    font-size: 11px; font-weight: 700;
   }
+  .vtag.off { background: rgba(220,53,69,.10); color: #b42336; }
+  .vtag.on  { background: rgba(34,197,94,.12); color: #166534; }
+  .vantagem-actions { display: flex; gap: 8px; }
 
-  .vtag.off {
-    background: rgba(220,53,69,.10);
-    color: #b42336;
-  }
-
-  .vtag.on {
-    background: rgba(34,197,94,.12);
-    color: #166534;
-  }
-
-  .vantagem-actions {
-    display: flex;
-    gap: 8px;
-  }
-
-  /* ── INFO GRID ── */
+  /* INFO GRID */
   .empresa-info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 14px;
   }
-
   .empresa-info-item label {
-    display: block;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: rgba(60,52,137,0.55);
-    margin-bottom: 4px;
+    display: block; font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: rgba(60,52,137,0.55); margin-bottom: 4px;
   }
+  .empresa-info-item span { font-size: 14px; color: #26215C; font-weight: 600; }
 
-  .empresa-info-item span {
-    font-size: 14px;
-    color: #26215C;
-    font-weight: 600;
-  }
-
-
-  /* ── RESGATES ── */
-  .resgate-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
+  /* RESGATES */
+  .resgate-list { display: flex; flex-direction: column; gap: 10px; }
   .resgate-item {
     background: rgba(255,255,255,.45);
     border: 1px solid rgba(255,255,255,.62);
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 16px; padding: 16px;
     display: grid;
     grid-template-columns: 1.2fr 1fr 1fr auto;
-    gap: 14px;
-    align-items: center;
+    gap: 14px; align-items: center;
   }
-
-  .resgate-code {
-    font-weight: 800;
-    color: #534AB7;
-    letter-spacing: .6px;
-  }
-
+  .resgate-code { font-weight: 800; color: #534AB7; letter-spacing: .6px; }
   .resgate-label {
-    display: block;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: rgba(60,52,137,0.55);
-    margin-bottom: 4px;
+    display: block; font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: rgba(60,52,137,0.55); margin-bottom: 4px;
   }
+  .resgate-value { color: #26215C; font-size: 13px; font-weight: 600; }
 
-  .resgate-value {
-    color: #26215C;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
+  /* Status badge */
   .resgate-status {
-    border-radius: 999px;
-    padding: 8px 12px;
-    background: rgba(83,74,183,.10);
-    color: #534AB7;
-    font-size: 11px;
-    font-weight: 800;
-    text-align: center;
+    border-radius: 999px; padding: 6px 12px;
+    font-size: 11px; font-weight: 800; text-align: center;
+    display: inline-flex; align-items: center; gap: 5px;
   }
+  .resgate-status.GERADO    { background: rgba(59,130,246,.12); color: #2563eb; }
+  .resgate-status.UTILIZADO { background: rgba(34,197,94,.14);  color: #15803d; }
+  .resgate-status.EXPIRADO  { background: rgba(239,68,68,.12);  color: #b91c1c; }
+  .resgate-status.CANCELADO { background: rgba(100,116,139,.13);color: #475569; }
 
-  /* ── EMPTY STATE ── */
+  /* EMPTY STATE */
   .empty-state {
     border: 1px dashed rgba(83,74,183,.25);
     background: rgba(255,255,255,.25);
-    border-radius: 16px;
-    padding: 28px;
-    color: rgba(38,33,92,.55);
-    text-align: center;
-    font-size: 13px;
-    line-height: 1.6;
+    border-radius: 16px; padding: 28px;
+    color: rgba(38,33,92,.55); text-align: center;
+    font-size: 13px; line-height: 1.6;
   }
 
-  /* ── LOADING ── */
+  /* CONFIRM MODAL */
+  .confirm-overlay {
+    position: fixed; inset: 0;
+    background: rgba(38,33,92,0.4);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 300;
+  }
+  .confirm-box {
+    background: rgba(235,240,255,0.97);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,.7);
+    border-radius: 22px; padding: 36px 32px;
+    width: min(400px, 90vw);
+    box-shadow: 0 28px 64px rgba(38,33,92,.22);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    text-align: center;
+  }
+  .confirm-icon { font-size: 36px; margin-bottom: 4px; }
+  .confirm-title { font-size: 17px; font-weight: 700; color: #26215C; margin: 0; }
+  .confirm-msg   { font-size: 13px; color: rgba(38,33,92,.65); margin: 4px 0 16px; line-height: 1.5; }
+  .confirm-actions { display: flex; gap: 10px; justify-content: center; width: 100%; }
+
+  /* LOADING */
   .empresa-loading {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Play', sans-serif;
-    font-size: 14px;
-    color: rgba(83,74,183,.6);
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font-family: 'Play', sans-serif; font-size: 14px; color: rgba(83,74,183,.6);
     background: linear-gradient(135deg, #eef3ff 0%, #dfe8ff 100%);
   }
 
@@ -472,7 +354,6 @@ const styles = `
     .empresa-form-grid { grid-template-columns: 1fr; }
     .empresa-field.full { grid-column: 1; }
   }
-
   @media (max-width: 620px) {
     .empresa-page { padding: 90px 16px 40px; }
     .empresa-page-header { flex-direction: column; }
@@ -483,34 +364,38 @@ const styles = `
 `;
 
 const NAV_ITEMS = [
-  { label: "Dashboard", id: "topo" },
+  { label: "Dashboard",      id: "topo" },
   { label: "Criar vantagem", id: "form-vantagem" },
-  { label: "Vantagens", id: "lista-vantagens" },
-  { label: "Resgates", id: "historico" },
-  { label: "Perfil", id: "perfil" },
+  { label: "Vantagens",      id: "lista-vantagens" },
+  { label: "Resgates",       id: "historico" },
+  { label: "Perfil",         id: "perfil" },
 ];
+
+const STATUS_DOT = { GERADO: "🔵", UTILIZADO: "🟢", EXPIRADO: "🔴", CANCELADO: "⚫" };
 
 export default function EmpresaDashboard() {
   const navigate = useNavigate();
   const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
 
-  const [empresa, setEmpresa] = useState(null);
-  const [vantagens, setVantagens] = useState([]);
-  const [resgates, setResgates] = useState([]);
-  const [formVantagem, setFormVantagem] = useState(emptyVantagem);
-  const [editandoVantagemId, setEditandoVantagemId] = useState(null);
-  const [formPerfil, setFormPerfil] = useState({});
-  const [editandoPerfil, setEditandoPerfil] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [navAtivo, setNavAtivo] = useState("topo");
-  const [buscandoCepPerfil, setBuscandoCepPerfil] = useState(false);
+  const [empresa,           setEmpresa]           = useState(null);
+  const [vantagens,         setVantagens]          = useState([]);
+  const [resgates,          setResgates]           = useState([]);
+  const [formVantagem,      setFormVantagem]       = useState(emptyVantagem);
+  const [editandoVantagemId,setEditandoVantagemId] = useState(null);
+  const [formPerfil,        setFormPerfil]         = useState({});
+  const [editandoPerfil,    setEditandoPerfil]     = useState(false);
+  const [loading,           setLoading]            = useState(true);
+  const [navAtivo,          setNavAtivo]           = useState("topo");
+  const [buscandoCepPerfil, setBuscandoCepPerfil]  = useState(false);
   const [ultimoCepPerfilBuscado, setUltimoCepPerfilBuscado] = useState("");
 
+  // modal de confirmação
+  const [confirm, setConfirm] = useState(null); // { titulo, mensagem, labelConfirmar, perigoso, onConfirmar }
+
   const totalAtivas = useMemo(() => vantagens.filter((v) => v.ativa).length, [vantagens]);
-  const custoMedio = useMemo(() => {
+  const custoMedio  = useMemo(() => {
     if (!vantagens.length) return 0;
-    const soma = vantagens.reduce((acc, v) => acc + Number(v.custoMoedas || 0), 0);
-    return Math.round(soma / vantagens.length);
+    return Math.round(vantagens.reduce((acc, v) => acc + Number(v.custoMoedas || 0), 0) / vantagens.length);
   }, [vantagens]);
 
   useEffect(() => { carregarDados(); }, []);
@@ -520,15 +405,9 @@ export default function EmpresaDashboard() {
       setLoading(true);
       const { data } = await empresaService.listar();
       const minhaEmpresa = data.find((e) => e.email === usuarioLogado?.email);
-
-      if (!minhaEmpresa) {
-        toast.error("Empresa não encontrada.");
-        return;
-      }
-
+      if (!minhaEmpresa) { toast.error("Empresa não encontrada."); return; }
       setEmpresa(minhaEmpresa);
       prepararFormPerfil(minhaEmpresa);
-
       const [vantagensRes, resgatesRes] = await Promise.all([
         vantagemService.listarPorEmpresa(minhaEmpresa.id),
         resgateService.listarPorEmpresa(minhaEmpresa.id),
@@ -544,10 +423,8 @@ export default function EmpresaDashboard() {
 
   function prepararFormPerfil(e) {
     setFormPerfil({
-      nome: e.nome || "",
-      email: e.email || "",
-      cpf: e.cpf || "",
-      cnpj: e.cnpj || "",
+      nome: e.nome || "", email: e.email || "",
+      cpf: e.cpf || "", cnpj: e.cnpj || "",
       nomeFantasia: e.nomeFantasia || "",
       endereco: {
         logradouro: e.endereco?.logradouro || "",
@@ -584,8 +461,8 @@ export default function EmpresaDashboard() {
   }
 
   function validarVantagem() {
-    if (!formVantagem.titulo.trim()) return "Informe o título da vantagem.";
-    if (!formVantagem.descricao.trim()) return "Informe a descrição.";
+    if (!formVantagem.titulo.trim())                                       return "Informe o título da vantagem.";
+    if (!formVantagem.descricao.trim())                                    return "Informe a descrição.";
     if (!formVantagem.custoMoedas || Number(formVantagem.custoMoedas) <= 0) return "Custo em moedas deve ser maior que zero.";
     return null;
   }
@@ -594,7 +471,6 @@ export default function EmpresaDashboard() {
     e.preventDefault();
     const erro = validarVantagem();
     if (erro) { toast.error(erro); return; }
-
     try {
       const payload = montarPayload();
       if (editandoVantagemId) {
@@ -615,25 +491,30 @@ export default function EmpresaDashboard() {
   function editarVantagem(v) {
     setEditandoVantagemId(v.id);
     setFormVantagem({
-      titulo: v.titulo || "",
-      descricao: v.descricao || "",
-      custoMoedas: v.custoMoedas || "",
-      fotoUrl: v.fotoUrl || "",
-      quantidadeDisponivel: v.quantidadeDisponivel ?? "",
-      ativa: v.ativa ?? true,
+      titulo: v.titulo || "", descricao: v.descricao || "",
+      custoMoedas: v.custoMoedas || "", fotoUrl: v.fotoUrl || "",
+      quantidadeDisponivel: v.quantidadeDisponivel ?? "", ativa: v.ativa ?? true,
     });
     scrollTo("form-vantagem");
   }
 
-  async function excluirVantagem(id) {
-    if (!window.confirm("Deseja excluir esta vantagem?")) return;
-    try {
-      await vantagemService.deletar(id);
-      setVantagens((lista) => lista.filter((v) => v.id !== id));
-      toast.success("Vantagem excluída.");
-    } catch {
-      toast.error("Erro ao excluir vantagem.");
-    }
+  function excluirVantagem(id) {
+    setConfirm({
+      titulo: "Excluir vantagem",
+      mensagem: "Essa ação não pode ser desfeita. Deseja remover esta vantagem definitivamente?",
+      labelConfirmar: "Excluir",
+      perigoso: true,
+      onConfirmar: async () => {
+        setConfirm(null);
+        try {
+          await vantagemService.deletar(id);
+          setVantagens((lista) => lista.filter((v) => v.id !== id));
+          toast.success("Vantagem excluída.");
+        } catch {
+          toast.error("Erro ao excluir vantagem.");
+        }
+      },
+    });
   }
 
   function limparForm() {
@@ -649,7 +530,6 @@ export default function EmpresaDashboard() {
   async function buscarCepPerfil(cep) {
     const cepLimpo = String(cep || "").replace(/\D/g, "");
     if (cepLimpo.length !== 8 || cepLimpo === ultimoCepPerfilBuscado) return;
-
     try {
       setBuscandoCepPerfil(true);
       const endereco = await cepService.buscarPorCep(cepLimpo);
@@ -657,15 +537,14 @@ export default function EmpresaDashboard() {
       setFormPerfil((atual) => ({
         ...atual,
         endereco: {
-          ...atual.endereco,
-          ...endereco,
+          ...atual.endereco, ...endereco,
           numero: atual.endereco?.numero || "",
           complemento: atual.endereco?.complemento || endereco.complemento,
         },
       }));
     } catch (err) {
       setUltimoCepPerfilBuscado("");
-      toast.error(err.message || "Nao foi possivel buscar o CEP.");
+      toast.error(err.message || "Não foi possível buscar o CEP.");
     } finally {
       setBuscandoCepPerfil(false);
     }
@@ -675,10 +554,7 @@ export default function EmpresaDashboard() {
     const { name } = e.target;
     const value = name === "cep" ? formatarCep(e.target.value) : e.target.value;
     setFormPerfil((f) => ({ ...f, endereco: { ...f.endereco, [name]: value } }));
-
-    if (name === "cep") {
-      buscarCepPerfil(value);
-    }
+    if (name === "cep") buscarCepPerfil(value);
   }
 
   async function salvarPerfil(e) {
@@ -711,6 +587,13 @@ export default function EmpresaDashboard() {
     <>
       <style>{styles}</style>
 
+      {confirm && (
+        <ConfirmModal
+          {...confirm}
+          onCancelar={() => setConfirm(null)}
+        />
+      )}
+
       <main className="empresa-page">
 
         <div className="empresa-page-header" id="topo">
@@ -718,18 +601,15 @@ export default function EmpresaDashboard() {
             <h1 className="empresa-page-title">{nomeExibido}</h1>
             <p className="empresa-page-sub">Gerencie vantagens, resgates e dados da empresa.</p>
           </div>
-          <button className="empresa-btn-outline" type="button" onClick={() => navigate("/empresa/resgates/validar")}>
-            Validar resgate
+          {/* CTA mais vivo */}
+          <button className="empresa-btn-cta" type="button" onClick={() => navigate("/empresa/resgates/validar")}>
+             Validar resgate
           </button>
         </div>
 
         <nav className="empresa-nav">
           {NAV_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              className={navAtivo === item.id ? "active" : ""}
-              onClick={() => scrollTo(item.id)}
-            >
+            <button key={item.id} className={navAtivo === item.id ? "active" : ""} onClick={() => scrollTo(item.id)}>
               {item.label}
             </button>
           ))}
@@ -781,9 +661,10 @@ export default function EmpresaDashboard() {
                   placeholder="Ex.: 20% de desconto no almoço" />
               </div>
 
+              {/* Campo custo com destaque visual */}
               <div className="empresa-field">
-                <label className="empresa-label">Custo em KRN</label>
-                <input className="empresa-input" name="custoMoedas" type="number" min="1"
+                <label className="empresa-label destaque">⬡ Custo em KRN</label>
+                <input className="empresa-input destaque" name="custoMoedas" type="number" min="1"
                   value={formVantagem.custoMoedas} onChange={handleVantagemChange}
                   placeholder="Ex.: 150" />
               </div>
@@ -799,7 +680,7 @@ export default function EmpresaDashboard() {
                 <label className="empresa-label">Quantidade disponível</label>
                 <input className="empresa-input" name="quantidadeDisponivel" type="number" min="0"
                   value={formVantagem.quantidadeDisponivel} onChange={handleVantagemChange}
-                  placeholder="Opcional" />
+                  placeholder="Opcional — deixe vazio para ilimitado" />
               </div>
 
               <div className="empresa-field full">
@@ -820,9 +701,7 @@ export default function EmpresaDashboard() {
               <button className="empresa-btn" type="submit">
                 {editandoVantagemId ? "Salvar alterações" : "Cadastrar vantagem"}
               </button>
-              <button className="empresa-btn-outline" type="button" onClick={limparForm}>
-                Limpar
-              </button>
+              <button className="empresa-btn-outline" type="button" onClick={limparForm}>Limpar</button>
             </div>
           </form>
         </section>
@@ -850,13 +729,13 @@ export default function EmpresaDashboard() {
                     <h4 className="vantagem-title">{v.titulo}</h4>
                     <p className="vantagem-desc">{v.descricao}</p>
                     <div className="vantagem-meta">
-                      <span className="vtag">{v.custoMoedas} KRN</span>
+                      <span className="vtag">⬡ {v.custoMoedas} KRN</span>
                       <span className="vtag">Qtd: {v.quantidadeDisponivel ?? "Ilimitada"}</span>
                       <span className={`vtag ${v.ativa ? "on" : "off"}`}>{v.ativa ? "Ativa" : "Inativa"}</span>
                     </div>
                     <div className="vantagem-actions">
-                      <button className="empresa-btn-muted" onClick={() => editarVantagem(v)}>Editar</button>
-                      <button className="empresa-btn-danger" onClick={() => excluirVantagem(v.id)}>Excluir</button>
+                      <button className="empresa-btn-muted"   onClick={() => editarVantagem(v)}>Editar</button>
+                      <button className="empresa-btn-danger"  onClick={() => excluirVantagem(v.id)}>Excluir</button>
                     </div>
                   </div>
                 </article>
@@ -865,7 +744,7 @@ export default function EmpresaDashboard() {
           )}
         </section>
 
-        {/* Histórico */}
+        {/* Histórico de resgates */}
         <section className="empresa-card" id="historico">
           <div className="empresa-card-head">
             <div>
@@ -897,7 +776,9 @@ export default function EmpresaDashboard() {
                   <div>
                     <span className="resgate-label">Data</span>
                     <span className="resgate-value">{r.dataResgate ? new Date(r.dataResgate).toLocaleString("pt-BR") : "—"}</span>
-                    <div className="resgate-status">{r.status}</div>
+                    <span className={`resgate-status ${r.status}`}>
+                      {STATUS_DOT[r.status] ?? "⚪"} {r.status}
+                    </span>
                   </div>
                 </article>
               ))}
@@ -920,14 +801,14 @@ export default function EmpresaDashboard() {
           {!editandoPerfil ? (
             <div className="empresa-info-grid">
               {[
-                ["Responsável", empresa?.nome],
-                ["Nome fantasia", empresa?.nomeFantasia],
-                ["Email", empresa?.email],
-                ["CNPJ", empresa?.cnpj],
-                ["CPF", empresa?.cpf],
-                ["Cidade / Estado", `${empresa?.endereco?.cidade || "—"} / ${empresa?.endereco?.estado || "—"}`],
-                ["Endereço", `${empresa?.endereco?.logradouro || "—"}, ${empresa?.endereco?.numero || "—"}`],
-                ["CEP", empresa?.endereco?.cep],
+                ["Responsável",    empresa?.nome],
+                ["Nome fantasia",  empresa?.nomeFantasia],
+                ["Email",          empresa?.email],
+                ["CNPJ",           empresa?.cnpj],
+                ["CPF",            empresa?.cpf],
+                ["Cidade / Estado",`${empresa?.endereco?.cidade || "—"} / ${empresa?.endereco?.estado || "—"}`],
+                ["Endereço",       `${empresa?.endereco?.logradouro || "—"}, ${empresa?.endereco?.numero || "—"}`],
+                ["CEP",            empresa?.endereco?.cep],
               ].map(([label, val]) => (
                 <div className="empresa-info-item" key={label}>
                   <label>{label}</label>
@@ -940,10 +821,10 @@ export default function EmpresaDashboard() {
               <div className="empresa-form-grid">
                 {[
                   ["Nome responsável", "nome"],
-                  ["Nome fantasia", "nomeFantasia"],
-                  ["Email", "email"],
-                  ["CPF", "cpf"],
-                  ["CNPJ", "cnpj"],
+                  ["Nome fantasia",    "nomeFantasia"],
+                  ["Email",           "email"],
+                  ["CPF",             "cpf"],
+                  ["CNPJ",            "cnpj"],
                 ].map(([label, campo]) => (
                   <div className="empresa-field" key={campo}>
                     <label className="empresa-label">{label}</label>
@@ -953,14 +834,14 @@ export default function EmpresaDashboard() {
                 ))}
 
                 {[
-                  ["Logradouro", "logradouro"],
-                  ["Número", "numero"],
+                  ["Logradouro",  "logradouro"],
+                  ["Número",      "numero"],
                   ["Complemento", "complemento"],
-                  ["Bairro", "bairro"],
-                  ["Cidade", "cidade"],
-                  ["Estado", "estado"],
-                  ["CEP", "cep"],
-                  ["País", "pais"],
+                  ["Bairro",      "bairro"],
+                  ["Cidade",      "cidade"],
+                  ["Estado",      "estado"],
+                  ["CEP",         "cep"],
+                  ["País",        "pais"],
                 ].map(([label, campo]) => (
                   <div className="empresa-field" key={campo}>
                     <label className="empresa-label">{label}</label>
@@ -968,7 +849,7 @@ export default function EmpresaDashboard() {
                       placeholder={campo === "cep" && buscandoCepPerfil ? "Buscando CEP..." : undefined}
                       value={formPerfil.endereco?.[campo] || ""} onChange={handleEnderecoChange} />
                     {campo === "cep" && buscandoCepPerfil && (
-                      <span className="empresa-card-desc">Buscando endereco...</span>
+                      <span className="empresa-card-desc">Buscando endereço...</span>
                     )}
                   </div>
                 ))}
