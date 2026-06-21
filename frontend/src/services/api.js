@@ -1,3 +1,5 @@
+// 🔍 Code Review por Caio Lima — ver comentários no Pull Request
+
 import axios from "axios";
 
 const api = axios.create({

@@ -1,3 +1,5 @@
+// 🔍 Code Review por Caio Lima — ver comentários no Pull Request
+
 package com.moeda_estudantil.backend.security;
 
 import com.moeda_estudantil.backend.repository.UsuarioRepository;

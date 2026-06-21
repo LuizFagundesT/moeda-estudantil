@@ -1,3 +1,5 @@
+// 🔍 Code Review por Caio Lima — ver comentários no Pull Request
+
 package com.moeda_estudantil.backend.service;
 
 import com.moeda_estudantil.backend.dto.*;
